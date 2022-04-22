@@ -2,7 +2,6 @@ const express = require('express');
 const helmet = require("helmet");
 const cors = require("cors");
 const app = express();
-const bodyParser = require('body-parser')
 const path = require('path');
 const dotenv = require('dotenv');
 
@@ -14,15 +13,21 @@ let corsOptions = {
 
 app.use(cors(corsOptions));
 app.use(helmet());
-app.use(bodyParser.json());
+app.use(express.urlencoded({extended: true}));
+app.use(express.json());
+
+app.use((req, res, next) => {
+    console.log(req.body)
+    //console.log(req)
+    next();
+});
 
 const userRoutes = require("./routes/user");
-app.use('/api/users', userRoutes);
+const apiRoot = '/api/users'
+app.use(apiRoot, userRoutes);
 
 const postRoutes = require("./routes/meme");
-app.use('/api/post', postRoutes);
-
-app.use(bodyParser.json());
+app.use(apiRoot + '/:userId/post', postRoutes);
 
 app.use('/images', express.static(path.join(__dirname, 'images')));
 

@@ -6,12 +6,14 @@ const auth = require("../middleware/auth");
 const multer = require("../middleware/multer-config");
 
 
-// Create a new User ✅
-router.post("/signup", userCtrl.signup);
-// Create a new User ✅
+// Create a new User
+router.post("/signup",multer, userCtrl.signup);
+// Login a user ✅
 router.post("/login", userCtrl.login);
 // Retrieve all Users ✅
 router.get("/", auth, userCtrl.findAll);
+// Retrieve all Users with theirs memes
+router.get("/", auth, userCtrl.findAllWithMeme);
 // Retrieve all admin's User ✅
 router.get("/admin", auth, userCtrl.findAllAdmin);
 // Retrieve a single User with id ✅

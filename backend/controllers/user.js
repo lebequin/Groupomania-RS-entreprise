@@ -1,42 +1,37 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-
+const utils = require('../utils');
 const db = require("../models");
 const User = db.user;
 const Op = db.Sequelize.Op;
 
 const fs = require("fs");
+const logger = require("../middleware/logger");
 const TOKEN = process.env.TOKEN;
 
 // Create and Save a new User
 exports.signup = (req, res) => {
-    if (!req.body) {
-        res.status(400).send({
-            message: "Content cannot be empty!"
-        });
-    }
-    // Save User in the database
-    bcrypt.hash(req.body.password, 10)
-        .then(hash => {
-            const user = {
-                email: req.body.email,
-                pseudo: req.body.pseudo,
-                avatarUrl: req.body.avatarUrl,
-                password: hash,
-                isAdmin: req.body.isAdmin,
-            }
-            User.create(user)
-                .then(() => res.status(201).json({
-                    message: 'Utilisateur créé avec succès !'
-                }))
-                .catch(error => res.status(400).json({
-                    message: 'Impossible de créer l\'utilisateur',
-                    error
-                }));
-        })
-        .catch(error => res.status(500).json({ error }));
-};
+    let avatarUrl = null;
+    utils.verifySignup(req, res)
+    logger.info('Enter signup function');
 
+    if (req.file) {
+        avatarUrl = `${req.protocol}://${req.get('host')}/images/avatars/${req.file.filename}`
+        logger.log('avatar file: ' + avatarUrl)
+    }
+
+    // Save User in the database
+    const user = {
+        email: req.body.email,
+        pseudo: req.body.pseudo,
+        avatarUrl: avatarUrl,
+        password: utils.hashPassword(req.body.password),
+        isAdmin: req.body.isAdmin,
+    }
+    User.create(user)
+        .then(() => res.status(201).json({ message: 'Utilisateur créé avec succès !'}))
+        .catch(error => res.status(400).json({ message: 'Impossible de créer l\'utilisateur', error}));
+};
 
 exports.login = (req, res, next) => {
     User.findOne({
@@ -51,9 +46,9 @@ exports.login = (req, res, next) => {
                     return res.status(401).json({ error: 'Mot de passe incorrect !'});
                 }
                 res.status(200).json({
-                    id: req.params._id,
+                    id: User._id,
                     token: jwt.sign(
-                        { id: req.params._id },
+                        { id: User._id },
                         `${TOKEN}`,
                         { expiresIn: '24h' }
                     )
@@ -69,7 +64,7 @@ exports.getOneUser = (req, res) => {
     User.findByPk(id)
         .then(data => {
             if (data) {
-                res.send(data);
+                res.status(200).send(data);
             } else {
                 res.status(404).send({
                     message: `Cannot find User with id=${id}.`
@@ -85,73 +80,37 @@ exports.getOneUser = (req, res) => {
 
 // Update a User identified by the email in the request
 exports.update = (req, res) => {
-    const id = req.params.id;
+    const headerAuth = req.headers["authorization"];
+    const userId = utils.getUserId(headerAuth);
 
-    if(req.file){
-        User.findOne({ _id: req.params.id }).then(user => {
-            const filename = user.imageUrl.split('/images/')[1];
-            fs.unlink(`images/${filename}`, () => {
-                const userObject = {
-                    ...JSON.parse(req.body.user),
-                    avatarUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
-                }
-                User.update(...userObject, {
-                    where: { id: id }
-                })
-                    .then(num => {
-                        if (num === 1) {
-                            res.send({
-                                message: "User was updated successfully."
-                            });
-                        } else {
-                            res.send({
-                                message: `Cannot update User with id=${id}. Maybe User was not found or req.body is empty!`
-                            });
-                        }
-                    })
-                    .catch(err => {
-                        res.status(500).send({
-                            message: "Error updating User with id=" + id
-                        });
-                    });
-            });
-        })
-            .catch(error => res.status(500).json({ error }));
+    if (userId === req.params.id) {
+        const userObject = req.file ?
+            {
+                ...req.body.user,
+                avatarUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
+            } : { ... req.body};
+
+        User.update({ ...userObject, id:  req.params.id}, { where: {id: req.params.id} })
+            .then(() => res.status(200).json({ message: 'User updated successfully!'}))
+            .catch(error => res.status(400).json({ error }));
+
     }
     else {
-        console.log(req.body)
-        User.update( req.body, {
-            where: { id: req.params.id }
-        })
-            .then(num => {
-                if (num === 1) {
-                    res.send({
-                        message: "User was updated successfully."
-                    });
-                } else {
-                    res.send({
-                        message: `Cannot update User with id=${id}. Maybe User was not found or req.body is empty!`
-                    });
-                }
-            })
-            .catch(err => {
-                res.status(500).send({
-                    message: "Error updating User with id=" + id
-                });
-            });
+        res.status(401).send('You do not have permission to update this user')
     }
-
 };
 
 // Delete a User with the specified id in the request
 exports.delete = (req, res) => {
     const id = req.params.id;
-    const imageUrl = req.body.imageUrl;
+    const imageUrl = req.body.avatarUrl;
+
     User.destroy({
         where: { id: id }
     })
         .then(num => {
-            if (num === 1) {
+            console.log(num)
+            if (num == 1) {
                 const filename = imageUrl.split('/images/')[1];
                 fs.unlink(`images/${filename}`, () => {
                     User.delete({ _id: req.params.id })
@@ -220,3 +179,10 @@ exports.findAll = (req, res) => {
         });
 };
 
+exports.findAllWithMeme = () => {
+    return User.findAll({
+        include: ["memes"],
+    }).then((user) => {
+        return user;
+    });
+};

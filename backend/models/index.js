@@ -15,4 +15,10 @@ const db = {};
 db.Sequelize = Sequelize;
 db.sequelize = sequelize;
 db.user = require("./User.js")(sequelize, Sequelize);
+db.memes = require("./Meme.js")(sequelize, Sequelize);
+db.user.hasMany(db.memes, { as: "memes" });
+db.memes.belongsTo(db.user, {
+    foreignKey: "userId",
+    as: "user",
+});
 module.exports = db;

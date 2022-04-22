@@ -6,10 +6,15 @@ const memeCtrl = require('../controllers/meme');
 const auth = require('../middleware/auth');
 const multer = require('../middleware/multer-config')
 
-router.get('/', auth, memeCtrl.getAllMeme);
-router.post('/',auth, multer, memeCtrl.createMeme);
-router.get('/:id', auth, memeCtrl.getOneMeme);
-router.put('/:id', auth, multer, memeCtrl.modifyMeme);
-router.delete('/:id', auth, memeCtrl.deleteMeme);
+// Create a meme ❌
+router.post('/', multer, memeCtrl.createMeme);
+// Find a meme by pk ❌
+router.get('/:id', memeCtrl.findMemeById);
+// Update a meme by pk ❌
+router.put('/:id', multer, memeCtrl.updateMeme);
+// Delete a meme by pk ❌
+router.delete('/:id', memeCtrl.deleteMeme);
+// Get all memes from a user ✅
+router.get('/', memeCtrl.getAllMeme);
 
 module.exports = router
