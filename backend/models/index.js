@@ -2,7 +2,7 @@ const dbConfig = require("../config/db.config.js");
 const Sequelize = require("sequelize");
 const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
     host: dbConfig.HOST,
-    dialect: dbConfig.dialect,
+    dialect: dbConfig.DIALECT,
     operatorsAliases: false,
     pool: {
         max: dbConfig.pool.max,
@@ -15,10 +15,20 @@ const db = {};
 db.Sequelize = Sequelize;
 db.sequelize = sequelize;
 db.user = require("./User.js")(sequelize, Sequelize);
-db.memes = require("./Meme.js")(sequelize, Sequelize);
-db.user.hasMany(db.memes, { as: "memes" });
-db.memes.belongsTo(db.user, {
+db.meme = require("./Meme.js")(sequelize, Sequelize);
+db.like = require("./Like.js")(sequelize, Sequelize);
+db.user.hasMany(db.meme, { as: "memes" });
+db.meme.belongsTo(db.user, {
     foreignKey: "userId",
     as: "user",
+});
+db.meme.hasMany(db.like, { as: "likes" });
+db.like.belongsTo(db.user, {
+    foreignKey: "userId",
+    as: "user",
+});
+db.like.belongsTo(db.meme, {
+    foreignKey: "memeId",
+    as: "meme",
 });
 module.exports = db;

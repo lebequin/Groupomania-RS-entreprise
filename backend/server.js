@@ -1,8 +1,6 @@
 const http = require('http');
 const app = require('./app');
 
-const MY_PORT = process.env.PORT;
-
 const normalizePort = val => {
     const port = parseInt(val, 10);
 
@@ -14,7 +12,7 @@ const normalizePort = val => {
     }
     return false;
 };
-const port = normalizePort(process.env.PORT || MY_PORT);
+const port = normalizePort(process.env.PORT || 3000);
 app.set('port', port);
 
 const errorHandler = error => {

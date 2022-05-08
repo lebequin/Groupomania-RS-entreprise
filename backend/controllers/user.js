@@ -16,21 +16,23 @@ exports.signup = (req, res) => {
     logger.info('Enter signup function');
 
     if (req.file) {
-        avatarUrl = `${req.protocol}://${req.get('host')}/images/avatars/${req.file.filename}`
+        avatarUrl = `${req.protocol}://${req.get('host')}/images/${req.body.avatarUrl}`
         logger.log('avatar file: ' + avatarUrl)
     }
+    bcrypt.hash(req.body.password, 10)
+        .then(hash => {
+            const user = {
+                email: req.body.email,
+                pseudo: req.body.pseudo,
+                avatarUrl: req.body.avatarUrl,
+                password: hash,
+                isAdmin: req.body.isAdmin,
+            }
+            User.create(user)
+                .then(() => res.status(201).json({ message: 'Utilisateur créé avec succès !'}))
+                .catch(error => res.status(400).json({ message: 'Impossible de créer l\'utilisateur', error}));
+        });
 
-    // Save User in the database
-    const user = {
-        email: req.body.email,
-        pseudo: req.body.pseudo,
-        avatarUrl: avatarUrl,
-        password: utils.hashPassword(req.body.password),
-        isAdmin: req.body.isAdmin,
-    }
-    User.create(user)
-        .then(() => res.status(201).json({ message: 'Utilisateur créé avec succès !'}))
-        .catch(error => res.status(400).json({ message: 'Impossible de créer l\'utilisateur', error}));
 };
 
 exports.login = (req, res, next) => {

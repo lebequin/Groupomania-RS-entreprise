@@ -25,10 +25,6 @@ module.exports = {
         return userId;
     },
 
-    hashPassword: function (password) {
-        return bcrypt.hash(password, 10)
-    },
-
     /*isExist: function (res, email) {
         User.findOne({
             attributes: ['email'],

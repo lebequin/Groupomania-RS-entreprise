@@ -29,11 +29,14 @@ app.use(apiRoot, userRoutes);
 const postRoutes = require("./routes/meme");
 app.use(apiRoot + '/:userId/post', postRoutes);
 
+const likeRoutes = require("./routes/like");
+app.use('api/memes/:memeId/like', likeRoutes);
+
 app.use('/images', express.static(path.join(__dirname, 'images')));
 
 const db = require("./models");
 db.sequelize.sync({ force: false }).then(() => {
-    console.log("Drop and re-sync db.");
+    console.log("Database connection established");
 });
 
 module.exports = app;

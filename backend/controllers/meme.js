@@ -2,7 +2,7 @@ const fs = require('fs');
 
 const db = require("../models");
 const utils = require("../utils");
-const Meme = db.memes;
+const Meme = db.meme;
 
 exports.createMeme = (req, res, next) => {
     const id = req.params.id;
@@ -12,9 +12,7 @@ exports.createMeme = (req, res, next) => {
     if( userId === id ) {
         return Meme.create({
             title: req.body.title,
-            fileUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`,
-            likes: 0,
-            dislikes: 0,
+            fileUrl: `${req.protocol}://${req.get('host')}/images/${req.body.fileUrl}`,
             userID: userId,
         })
             .then(meme => {
@@ -53,7 +51,7 @@ exports.updateMeme = (req, res) => {
                 const filename = meme.fileUrl.split('/images/')[1];
                 fs.unlink(`images/${filename}`, () => {
                     const memeObject = {
-                        ...JSON.parse(req.body.memes),
+                        ...JSON.parse(req.body.meme),
                         fileUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
                     }
                     Meme.update(...memeObject, {
@@ -138,9 +136,9 @@ exports.getAllMeme = (req, res, next) => {
     Meme.findAll({order: [
             ['createdAt', 'DESC'],
         ]})
-        .then(memes => {
-            console.log(memes);
-            res.status(200).json({data: memes});
+        .then(meme => {
+            console.log(meme);
+            res.status(200).json({data: meme});
         })
         .catch(error => res.status(400).json({ error }));
 };

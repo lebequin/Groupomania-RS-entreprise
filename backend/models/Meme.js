@@ -1,6 +1,6 @@
 // constructor
 module.exports = (sequelize, Sequelize) => {
-    return sequelize.define("memes", {
+    return sequelize.define("meme", {
         title: {
             type: Sequelize.STRING,
             allowNull: false
@@ -9,14 +9,6 @@ module.exports = (sequelize, Sequelize) => {
             type: Sequelize.STRING,
             allowNull: false
         },
-        likes: {
-            type: Sequelize.INTEGER,
-            allowNull: false
-        },
-        dislikes: {
-            type: Sequelize.INTEGER,
-            defaultValue: false
-        }
     });
 };
 
