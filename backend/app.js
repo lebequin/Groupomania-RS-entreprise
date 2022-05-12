@@ -27,10 +27,13 @@ const apiRoot = '/api/users'
 app.use(apiRoot, userRoutes);
 
 const postRoutes = require("./routes/meme");
-app.use(apiRoot + '/:userId/post', postRoutes);
+app.use('/api/post', postRoutes);
 
 const likeRoutes = require("./routes/like");
-app.use('api/memes/:memeId/like', likeRoutes);
+app.use('api/post/:memeId/like', likeRoutes);
+
+const commentRoutes = require("./routes/like");
+app.use('api/post/', commentRoutes);
 
 app.use('/images', express.static(path.join(__dirname, 'images')));
 
