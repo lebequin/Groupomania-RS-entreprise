@@ -18,9 +18,9 @@ router.get("/", auth, userCtrl.findAllWithMeme);
 router.get("/admin", auth, userCtrl.findAllAdmin);
 // Retrieve a single User with id ✅
 router.get("/:id", auth, userCtrl.getOneUser);
-// Update a user ❌
+// Update a user ✅
 router.put("/:id", auth, userCtrl.update);
-// Delete a User with id ❌
+// Delete a User with id ✅
 router.delete("/:id", auth, userCtrl.delete);
 // Delete all Users ✅
 router.delete("/", auth, userCtrl.deleteAll);

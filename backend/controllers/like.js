@@ -1,6 +1,7 @@
 const db = require("../models");
 const Like = db.like;
 
+// Like d'un meme par default un meme est neutre
 exports.likeMeme = (req, res) => {
     Like.findOne({
         where: { userId: req.auth.userId, memeId: req.params.id },
@@ -34,6 +35,7 @@ exports.likeMeme = (req, res) => {
         .catch((err) => res.status(500).json({ err }));
 };
 
+// Récupère le nombre de likes sur un meme
 exports.getNumberLikeOnMeme = (req, res) => {
     Like.count({
         where: { memeId: req.params.id },

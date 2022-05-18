@@ -4,6 +4,7 @@ const db = require("../models");
 const utils = require("../utils");
 const Meme = db.meme;
 
+// Création d'un meme par un utilisateur connecté
 exports.createMeme = (req, res, next) => {
     const id = req.params.id;
     const headerAuth = req.headers["authorization"];
@@ -30,6 +31,7 @@ exports.createMeme = (req, res, next) => {
     }
 };
 
+// recherche d'un meme par pk
 exports.findMemeById = (id) => {
     return Meme.findByPk(id, { include: ["user"] })
         .then((meme) => {
@@ -40,12 +42,14 @@ exports.findMemeById = (id) => {
         });
 };
 
+// Mise un jour d'un meme et suppression de l'image en base si l'image envoyée est différente
 exports.updateMeme = (req, res) => {
     const id = req.params.id;
     const headerAuth = req.headers["authorization"];
     const userId = utils.getUserId(headerAuth);
 
     if( userId === id ) {
+        // Si un fichier est envoyé on supprime l'ancien pour ajouter le nouveau en base
         if (req.file) {
             Meme.findOne({id: req.params.id}).then(meme => {
                 const filename = meme.fileUrl.split('/images/')[1];
@@ -71,6 +75,7 @@ exports.updateMeme = (req, res) => {
             })
                 .catch(error => res.status(500).json({error}));
         } else {
+            // Sinon on modifie juste le meme
             Meme.update(req.body, {
                 where: {id: id}
             })
@@ -93,6 +98,7 @@ exports.updateMeme = (req, res) => {
     }
 };
 
+// Suppression du meme par id et suppression de l'image en base
 exports.deleteMeme = (req, res, next) => {
     const id = req.params.id;
     const fileUrl = req.body.fileUrl;
@@ -100,11 +106,13 @@ exports.deleteMeme = (req, res, next) => {
     const headerAuth = req.headers["authorization"];
     const userId = utils.getUserId(headerAuth);
 
-    if( userId === req.params.id ) {
+    // Vérification que c'est bien l'utilisateur connecté ou un admin pour supprimer le meme
+    if( userId === req.params.id || req.admin.isAdmin === true) {
         Meme.destroy({
             where: {id: id}
         })
             .then(num => {
+                // Si la suppression s'est bien passé on supprime l'image de la base
                 if (num === 1) {
                     const filename = fileUrl.split('/images/')[1];
                     fs.unlink(`images/${filename}`, () => {
@@ -132,6 +140,7 @@ exports.deleteMeme = (req, res, next) => {
     }
 };
 
+// Récupération de tous les memes par date de création descendante
 exports.getAllMeme = (req, res, next) => {
     Meme.findAll({order: [
             ['createdAt', 'DESC'],

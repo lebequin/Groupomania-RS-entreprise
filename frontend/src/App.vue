@@ -4,6 +4,7 @@
     <router-link to="/about">About</router-link>
   </nav>
   <router-view/>
+  <footer>Amazing footer</footer>
 </template>
 
 <style lang="scss">

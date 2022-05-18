@@ -9,7 +9,7 @@ const fs = require("fs");
 const logger = require("../middleware/logger");
 const TOKEN = process.env.TOKEN;
 
-// Create and Save a new User
+// Création et enregistrement d'un utilisateur
 exports.signup = (req, res) => {
     let avatarUrl = null;
     utils.verifySignup(req, res)
@@ -19,6 +19,7 @@ exports.signup = (req, res) => {
         avatarUrl = `${req.protocol}://${req.get('host')}/images/${req.body.avatarUrl}`
         logger.log('avatar file: ' + avatarUrl)
     }
+    // Chiffrage du mot de passe avec bcrypt et un salage de 10
     bcrypt.hash(req.body.password, 10)
         .then(hash => {
             const user = {
@@ -34,7 +35,7 @@ exports.signup = (req, res) => {
         });
 
 };
-
+// Connexion de l'utilisateur
 exports.login = (req, res, next) => {
     User.findOne({
         where: { email: req.body.email }
@@ -50,7 +51,7 @@ exports.login = (req, res, next) => {
                 res.status(200).json({
                     id: User._id,
                     token: jwt.sign(
-                        { id: User._id },
+                        { id: User._id , admin: User.isAdmin},
                         `${TOKEN}`,
                         { expiresIn: '24h' }
                     )
@@ -60,7 +61,7 @@ exports.login = (req, res, next) => {
 };
 
 
-// Find a single User with an id
+// Récupère un utilisateur par sa pk
 exports.getOneUser = (req, res) => {
     const id = req.params.id;
     User.findByPk(id)
@@ -80,7 +81,7 @@ exports.getOneUser = (req, res) => {
         });
 };
 
-// Update a User identified by the email in the request
+// Mettre à jour un utilisateur par sa pk
 exports.update = (req, res) => {
     const headerAuth = req.headers["authorization"];
     const userId = utils.getUserId(headerAuth);
@@ -102,57 +103,67 @@ exports.update = (req, res) => {
     }
 };
 
-// Delete a User with the specified id in the request
+// Supprimer l'utilisateur par sa pk
 exports.delete = (req, res) => {
-    const id = req.params.id;
+    const headerAuth = req.headers["authorization"];
+    const userId = utils.getUserId(headerAuth);
     const imageUrl = req.body.avatarUrl;
 
-    User.destroy({
-        where: { id: id }
-    })
-        .then(num => {
-            console.log(num)
-            if (num == 1) {
-                const filename = imageUrl.split('/images/')[1];
-                fs.unlink(`images/${filename}`, () => {
-                    User.delete({ _id: req.params.id })
-                        .then(() => res.status(200).json({ message: 'Objet supprimé !'}))
-                        .catch(error => res.status(400).json({ error }));
-                });
-                res.send({
-                    message: "User was deleted successfully!"
-                });
-            } else {
-                res.send({
-                    message: `Cannot delete User with id=${id}. Maybe User was not found!`
-                });
-            }
+    //Suppression de l'utilisateur uniquement par un admin
+    if (req.admin.isAdmin === false)
+        res.status(401).send('You do not have permission to delete this user')
+    else {
+        User.destroy({
+            where: {id: userId}
         })
-        .catch(err => {
-            res.status(500).send({
-                message: "Could not delete User with id=" + id
+            .then(num => {
+                console.log(num)
+                if (num == 1) {
+                    const filename = imageUrl.split('/images/')[1];
+                    fs.unlink(`images/${filename}`, () => {
+                        User.delete({_id: userId})
+                            .then(() => res.status(200).json({message: 'Objet supprimé !'}))
+                            .catch(error => res.status(400).json({error}));
+                    });
+                    res.send({
+                        message: "User was deleted successfully!"
+                    });
+                } else {
+                    res.send({
+                        message: `Cannot delete User with id=${id}. Maybe User was not found!`
+                    });
+                }
+            })
+            .catch(err => {
+                res.status(500).send({
+                    message: "Could not delete User with id=" + id
+                });
             });
-        });
+    }
 };
 
-// Delete all Users from the database.
+// Supprime tous les utilisateurs de la base
 exports.deleteAll = (req, res) => {
-    User.destroy({
-        where: {},
-        truncate: false
-    })
-        .then(nums => {
-            res.send({ message: `${nums} Users were deleted successfully!` });
+    if (req.admin.isAdmin === false)
+        res.status(401).send('You do not have permission to update this user')
+    else {
+        User.destroy({
+            where: {},
+            truncate: false
         })
-        .catch(err => {
-            res.status(500).send({
-                message:
-                    err.message || "Some error occurred while removing all users."
+            .then(nums => {
+                res.send({ message: `${nums} Users were deleted successfully!` });
+            })
+            .catch(err => {
+                res.status(500).send({
+                    message:
+                        err.message || "Some error occurred while removing all users."
+                });
             });
-        });
+    }
 };
 
-// Retrieve all Users from the database (with condition).
+// Récupère tous les admins de la base
 exports.findAllAdmin = (req, res) => {
     User.findAll({ where: { isAdmin: true } })
         .then(data => {
@@ -166,6 +177,7 @@ exports.findAllAdmin = (req, res) => {
         });
 };
 
+// récupère tous les utilisateurs par pseudo
 exports.findAll = (req, res) => {
     const pseudo = req.query.pseudo;
     var condition = pseudo ? { pseudo: { [Op.like]: `%${pseudo}%` } } : null;
@@ -180,7 +192,7 @@ exports.findAll = (req, res) => {
             });
         });
 };
-
+// récupère tous les utilisateurs avec leur meme associés
 exports.findAllWithMeme = () => {
     return User.findAll({
         include: ["memes"],

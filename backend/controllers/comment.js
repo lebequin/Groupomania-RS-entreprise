@@ -5,7 +5,15 @@ const User = db.user;
 
 //Création d'un commentaire
 exports.createComment = (req, res) => {
-    const comment = { ...req.body };
+    const memeId = req.params.id;
+    const headerAuth = req.headers["authorization"];
+    const userId = utils.getUserId(headerAuth);
+
+    const comment = {
+        content : req.body.content,
+        memeId : memeId,
+        userId : userId,
+    };
     Comment.create({ ...comment })
         .then(() => res.status(201).json(comment))
         .catch((err) => res.status(400).json(err));
@@ -25,6 +33,7 @@ exports.updateComment = (req, res) => {
             .then(() => res.status(200).json(req.body.content));
     });
 };
+
 // Obtenir tous les commentaire d'un meme
 exports.getAllCommentsOfMeme = (req, res) => {
     Comment.findAll({
@@ -34,6 +43,7 @@ exports.getAllCommentsOfMeme = (req, res) => {
         .then((comments) => res.status(200).json(comments))
         .catch((error) => res.status(400).json({ error }));
 };
+
 //Supprimer un commentaire
 exports.deleteComment = (req, res) => {
     Comment.findOne({
@@ -44,11 +54,10 @@ exports.deleteComment = (req, res) => {
                 return res.status(400).json({ message: "Comment not found" });
             }
             //Vérifie si c'est le créateur du commentaire ou l'admin qui effectue la requête
-            if (comment.userId !== req.auth.userId) {
+            if (comment.userId !== req.auth.userId && req.admin.isAdmin === false) {
                 return res.status(401).json({ message: "You do not have permission to delete this Comment" });
             }
-            comment
-                .destroy()
+            comment.destroy()
                 .then(() => res.status(200).json({ message: "Comment deleted" }))
                 .catch((err) => res.status(400).json({ err }));
         })
