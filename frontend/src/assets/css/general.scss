@@ -1,0 +1,27 @@
+.input-field {
+  padding: 8px;
+  border-radius: 8px;
+  border-color: #00B06B;
+}
+
+.btn {
+  margin: 1em 0;
+  padding: 13px;
+  background-image: linear-gradient(60deg, #00B06B, #00FC99);
+  border: none;
+  border-radius: 8px;
+  color: #2c3e50;
+  font-weight: bold;
+
+  &--upload {
+    font-variant: small-caps;
+  }
+  &-secondary {
+    background-image: linear-gradient(60deg, #B01D00, #fd2d01);
+    color: #fff;
+  }
+}
+
+.form-group {
+  margin: 0.3em 0;
+}
