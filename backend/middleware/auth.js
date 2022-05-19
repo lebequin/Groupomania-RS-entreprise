@@ -9,9 +9,7 @@ module.exports = (req, res, next) => {
         const decodedToken = jwt.verify(token, `${TOKEN}`);
 
         const userId = decodedToken.userId;
-        const isAdmin = decodedToken.isAdmin;
 
-        req.admin = { isAdmin };
         const user = User.findOne({
             where: {
                 id: userId,
@@ -23,8 +21,10 @@ module.exports = (req, res, next) => {
             return res.status(401).json({ message: "Your not authorized" });
         } else {
             req.auth = { userId };
+            req.admin = { isAdmin: user.isAdmin };
             next();
         }
+        // suppression req.Admin
     } catch {
         res.status(401).json({
             error: new Error('Invalid request!')

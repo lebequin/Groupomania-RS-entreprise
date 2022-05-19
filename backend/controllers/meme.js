@@ -115,16 +115,12 @@ exports.deleteMeme = (req, res, next) => {
                 // Si la suppression s'est bien passé on supprime l'image de la base
                 if (num === 1) {
                     const filename = fileUrl.split('/images/')[1];
-                    fs.unlink(`images/${filename}`, () => {
-                        Meme.delete({_id: req.params.id})
-                            .then(() => res.status(200).json({message: 'Meme supprimé !'}))
-                            .catch(error => res.status(400).json({error}));
-                    });
-                    res.send({
+                    fs.unlinkSync(`images/${filename}`);
+                    res.status(200).send({
                         message: "Meme was deleted successfully!"
                     });
                 } else {
-                    res.send({
+                    res.status(400).send({
                         message: `Cannot delete Meme with id=${id}. Maybe Meme was not found!`
                     });
                 }

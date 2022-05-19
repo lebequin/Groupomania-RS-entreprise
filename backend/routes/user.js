@@ -22,8 +22,5 @@ router.get("/:id", auth, userCtrl.getOneUser);
 router.put("/:id", auth, userCtrl.update);
 // Delete a User with id ✅
 router.delete("/:id", auth, userCtrl.delete);
-// Delete all Users ✅
-router.delete("/", auth, userCtrl.deleteAll);
-
 module.exports = router;
 

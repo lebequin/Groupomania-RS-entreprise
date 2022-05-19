@@ -119,17 +119,14 @@ exports.delete = (req, res) => {
             .then(num => {
                 console.log(num)
                 if (num == 1) {
+                    // Suppression de l'image de l'utilisateur
                     const filename = imageUrl.split('/images/')[1];
-                    fs.unlink(`images/${filename}`, () => {
-                        User.delete({_id: userId})
-                            .then(() => res.status(200).json({message: 'Objet supprimé !'}))
-                            .catch(error => res.status(400).json({error}));
-                    });
-                    res.send({
+                    fs.unlinkSync(`images/${filename}`);
+                    res.status(200).send({
                         message: "User was deleted successfully!"
                     });
                 } else {
-                    res.send({
+                    res.status(400).send({
                         message: `Cannot delete User with id=${id}. Maybe User was not found!`
                     });
                 }
@@ -137,27 +134,6 @@ exports.delete = (req, res) => {
             .catch(err => {
                 res.status(500).send({
                     message: "Could not delete User with id=" + id
-                });
-            });
-    }
-};
-
-// Supprime tous les utilisateurs de la base
-exports.deleteAll = (req, res) => {
-    if (req.admin.isAdmin === false)
-        res.status(401).send('You do not have permission to update this user')
-    else {
-        User.destroy({
-            where: {},
-            truncate: false
-        })
-            .then(nums => {
-                res.send({ message: `${nums} Users were deleted successfully!` });
-            })
-            .catch(err => {
-                res.status(500).send({
-                    message:
-                        err.message || "Some error occurred while removing all users."
                 });
             });
     }
