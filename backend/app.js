@@ -38,7 +38,7 @@ app.use('api/post/', commentRoutes);
 app.use('/images', express.static(path.join(__dirname, 'images')));
 
 const db = require("./models");
-db.sequelize.sync({ force: false }).then(() => {
+db.sequelize.sync({force: false}).then(() => {
     console.log("Database connection established");
 });
 

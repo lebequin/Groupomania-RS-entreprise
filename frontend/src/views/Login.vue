@@ -72,8 +72,10 @@ export default {
 
                 // Converting to JSON
                 .then(response => {
+                    console.log(response)
                     localStorage.setItem('token', response.data.token)
                     location.replace("/")
+
                 })
 
                 // Displaying results to console

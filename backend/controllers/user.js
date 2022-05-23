@@ -30,34 +30,33 @@ exports.signup = (req, res) => {
                 isAdmin: req.body.isAdmin,
             }
             User.create(user)
-                .then(() => res.status(201).json({ message: 'Utilisateur créé avec succès !'}))
-                .catch(error => res.status(400).json({ message: 'Impossible de créer l\'utilisateur', error}));
+                .then(() => res.status(201).json({message: 'Utilisateur créé avec succès !'}))
+                .catch(error => res.status(400).json({message: 'Impossible de créer l\'utilisateur', error}));
         });
 
 };
 // Connexion de l'utilisateur
 exports.login = (req, res, next) => {
     User.findOne({
-        where: { email: req.body.email }
+        where: {email: req.body.email}
     }).then(user => {
         if (!user) {
-            return res.status(401).json({ error: 'Utilisateur non trouvé !'});
+            return res.status(401).json({error: 'Utilisateur non trouvé !'});
         }
         bcrypt.compare(req.body.password, user.password)
             .then(valid => {
                 if (!valid) {
-                    return res.status(401).json({ error: 'Mot de passe incorrect !'});
+                    return res.status(401).json({error: 'Mot de passe incorrect !'});
                 }
                 res.status(200).json({
-                    id: User._id,
                     token: jwt.sign(
-                        { id: User._id , admin: User.isAdmin},
+                        {id: user.id},
                         `${TOKEN}`,
-                        { expiresIn: '24h' }
+                        {expiresIn: '24h'}
                     )
                 });
-            }).catch(error => res.status(500).json({ error }));
-    }).catch(error => res.status(500).json({ error }));
+            }).catch(error => res.status(500).json({error}));
+    }).catch(error => res.status(500).json({error}));
 };
 
 
@@ -91,14 +90,13 @@ exports.update = (req, res) => {
             {
                 ...req.body.user,
                 avatarUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
-            } : { ... req.body};
+            } : {...req.body};
 
-        User.update({ ...userObject, id:  req.params.id}, { where: {id: req.params.id} })
-            .then(() => res.status(200).json({ message: 'User updated successfully!'}))
-            .catch(error => res.status(400).json({ error }));
+        User.update({...userObject, id: req.params.id}, {where: {id: req.params.id}})
+            .then(() => res.status(200).json({message: 'User updated successfully!'}))
+            .catch(error => res.status(400).json({error}));
 
-    }
-    else {
+    } else {
         res.status(401).send('You do not have permission to update this user')
     }
 };
@@ -141,7 +139,7 @@ exports.delete = (req, res) => {
 
 // Récupère tous les admins de la base
 exports.findAllAdmin = (req, res) => {
-    User.findAll({ where: { isAdmin: true } })
+    User.findAll({where: {isAdmin: true}})
         .then(data => {
             res.send(data);
         })
@@ -156,8 +154,8 @@ exports.findAllAdmin = (req, res) => {
 // récupère tous les utilisateurs par pseudo
 exports.findAll = (req, res) => {
     const pseudo = req.query.pseudo;
-    var condition = pseudo ? { pseudo: { [Op.like]: `%${pseudo}%` } } : null;
-    User.findAll({ where: condition })
+    var condition = pseudo ? {pseudo: {[Op.like]: `%${pseudo}%`}} : null;
+    User.findAll({where: condition})
         .then(data => {
             res.send(data);
         })

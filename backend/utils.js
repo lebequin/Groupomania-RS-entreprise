@@ -33,20 +33,23 @@ module.exports = {
             .catch(error => false);
     },*/
 
-    verifySignup: function (req, res){
+    verifySignup: function (req, res) {
         //regex W3c to validate email
         const regexEmail = /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
         //regex to fit minimum eight characters, at least one upper case English letter, one lower case English letter, one number and one special character
         const regexPassword = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$ %^&*-]).{8,}$/;
 
         if (req.body.email == null || req.body.pseudo == null || req.body.password == null) {
-            return res.status(400).json({ 'error': 'Fields email, pseudo and password are required' });
+            return res.status(400).json({'error': 'Fields email, pseudo and password are required'});
         }
         if (!regexEmail.test(req.body.email)) {
-            return res.status(400).json({ 'error': 'Email do not fit with exemple@mail.test' });
+            return res.status(400).json({'error': 'Email do not fit with exemple@mail.test'});
         }
         if (!regexPassword.test(req.body.password)) {
-            return res.status(400).json({ 'error': 'Your password must be 8 characters minimum long with 1 upper, lower, special and number character' });
+            return res.status(400).json({'error': 'Your password must be 8 characters minimum long with 1 upper, lower, special and number character'});
         }
+        return true;
     }
 };
+
+// Modifier la fonction pour avoir qu'un seul envoie de message d'erreur
