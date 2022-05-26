@@ -49,6 +49,7 @@ exports.login = (req, res, next) => {
                     return res.status(401).json({error: 'Mot de passe incorrect !'});
                 }
                 res.status(200).json({
+                    userId: user.id,
                     token: jwt.sign(
                         {id: user.id},
                         `${TOKEN}`,
@@ -63,6 +64,7 @@ exports.login = (req, res, next) => {
 // Récupère un utilisateur par sa pk
 exports.getOneUser = (req, res) => {
     const id = req.params.id;
+    console.log(id)
     User.findByPk(id)
         .then(data => {
             if (data) {

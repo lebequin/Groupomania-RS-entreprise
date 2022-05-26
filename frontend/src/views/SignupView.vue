@@ -121,10 +121,6 @@ export default {
     text-align: left;
 }
 
-.card-container {
-    max-width: 400px;
-    margin: auto;
-}
 
 .form > div {
     width: 100%;

@@ -5,11 +5,11 @@
                  src="../src/assets/logo/icon-left-font.svg">
             <nav id="menu">
                 <router-link to="/">Accueil</router-link>
-                <router-link to="/login">Connexion</router-link>
-                <router-link to="/signup">Inscription</router-link>
-                <router-link v-show="token != null" to="/post">Publier</router-link>
+                <router-link v-if="!token" to="/login">Connexion</router-link>
+                <router-link v-if="!token" to="/signup">Inscription</router-link>
+                <router-link v-show="token" to="/post">Publier</router-link>
                 <router-link v-show="token" to="/account">Mon compte</router-link>
-                <router-link v-show="token" to="/logout">Déconnexion</router-link>
+                <router-link v-show="token" to="/logout" @click="deconnexion">Déconnexion</router-link>
             </nav>
 
         </div>
@@ -28,6 +28,15 @@ export default {
     computed: {
         getCurrentYear() {
             return new Date().getFullYear()
+        }
+    },
+    methods: {
+        deconnexion() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('userId');
+            console.log(localStorage)
+            alert('Vous êtes déconnecté. Merci de votre visite.');
+            location.replace("/")
         }
     }
 }

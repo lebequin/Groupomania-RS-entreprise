@@ -51,14 +51,27 @@ export default {
             password: "",
         };
     },
-    mounted() {
-        if (localStorage.token) {
-            this.token = localStorage.token;
-        }
-    },
     methods: {
-        login() {
-            fetch('http://127.0.0.1:3000/api/users/login', {
+        async login() {
+            const {email, password} = this;
+            const res = await fetch(
+                "http://127.0.0.1:3000/api/users/login",
+                {
+                    method: "POST",
+                    headers: {"Content-Type": "application/json; charset=UTF-8"},
+                    body: JSON.stringify({email, password})
+                }
+            );
+            const data = await res.json();
+            console.log(data)
+            localStorage.setItem('token', data.token)
+            localStorage.setItem('userId', data.userId)
+            console.log(localStorage.getItem('token'))
+            console.log(localStorage.getItem('userId'))
+            location.replace("/")
+        }/*
+        async login() {
+            await fetch('http://127.0.0.1:3000/api/users/login', {
                 // Adding method type
                 method: "POST",
                 // Adding body or contents to send
@@ -73,7 +86,7 @@ export default {
                 // Converting to JSON
                 .then(response => {
                     console.log(response)
-                    localStorage.setItem('token', response.data.token)
+                    //localStorage.setItem('token', response.data.token)
                     location.replace("/")
 
                 })
@@ -86,7 +99,7 @@ export default {
                     console.error(error)
                     this.revele = !this.revele
                 })
-        },
+        },*/
     }
 };
 </script>

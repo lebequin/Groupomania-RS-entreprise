@@ -1,10 +1,10 @@
 <template>
     <div class="main">
         <!-- Si Connecté -->
-        <div v-if="token!=null">
+        <div v-if="token">
             <!-- Si pas d'articles' -->
             <div v-if="posts.length === 0">
-                <div class="text">Aucun contenu</div>
+                <div class="text">Aucun contenu pour le moment</div>
             </div>
             <!-- Si il y a des articles -->
             <div v-else class="login-box">
@@ -14,6 +14,8 @@
                 <!-- Boucle permettant l'affichage de tous les articles valider de la BDD -->
 
             </div>
+        </div>
+        <div v-else>
         </div>
 
     </div>
@@ -27,9 +29,10 @@ export default {
             token: localStorage.getItem('token'),
             posts: '',
             connexion: false,
-            name: localStorage.getItem("name")
         };
     },
+    
+
 }
 </script>
 
