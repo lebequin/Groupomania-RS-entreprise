@@ -7,7 +7,7 @@ const multer = require("../middleware/multer-config");
 
 
 // Create a new User
-router.post("/signup",multer, userCtrl.signup);
+router.post("/signup", multer, userCtrl.signup);
 // Login a user ✅
 router.post("/login", userCtrl.login);
 // Retrieve all Users ✅
@@ -19,7 +19,7 @@ router.get("/admin", auth, userCtrl.findAllAdmin);
 // Retrieve a single User with id ✅
 router.get("/:id", auth, userCtrl.getOneUser);
 // Update a user ✅
-router.put("/:id", auth, userCtrl.update);
+router.put("/:id", multer, auth, userCtrl.update);
 // Delete a User with id ✅
 router.delete("/:id", auth, userCtrl.delete);
 module.exports = router;

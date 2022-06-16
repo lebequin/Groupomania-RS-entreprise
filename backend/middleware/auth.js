@@ -8,22 +8,25 @@ module.exports = (req, res, next) => {
         const token = req.headers.authorization.split(' ')[1];
         const decodedToken = jwt.verify(token, `${TOKEN}`);
 
-        const userId = decodedToken.userId;
-
+        const userId = decodedToken.id;
         const user = User.findOne({
             where: {
                 id: userId,
             },
+        }).then(user => {
+
+            if (!user) {
+                return res.status(401).json({message: `Id : ${userId} does not exist.`});
+            } else if (req.body.userId && req.body.userId !== userId) {
+                return res.status(401).json({message: "Your not authorized"});
+            } else {
+                req.auth = {userId};
+                req.admin = {isAdmin: user.isAdmin};
+                next();
+            }
         });
-        if (!user) {
-            return res.status(401).json({ message: `Id : ${userId} does not exist.` });
-        } else if (req.body.userId && req.body.userId !== userId) {
-            return res.status(401).json({ message: "Your not authorized" });
-        } else {
-            req.auth = { userId };
-            req.admin = { isAdmin: user.isAdmin };
-            next();
-        }
+
+
         // suppression req.Admin
     } catch {
         res.status(401).json({

@@ -84,7 +84,10 @@ export default {
                 .then(response => response.json())
 
                 // Displaying results to console
-                .then(json => console.log(json))
+                .then(json => {
+                    console.log('donnée envoyées : ', json)
+                })
+
                 .then(() => this.$router.push("/users"))
                 .catch((err) => console.log(err));
         },

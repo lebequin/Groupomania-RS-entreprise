@@ -8,16 +8,20 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 let corsOptions = {
-    origin: "http://localhost:8080"
+    origin: "http://localhost:8080",
 };
 
-app.use(cors(corsOptions));
 app.use(helmet());
+app.use(cors(corsOptions));
+app.use((req, res, next) => {
+    res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin')
+    next();
+});
 app.use(express.urlencoded({extended: true}));
 app.use(express.json());
 
 app.use((req, res, next) => {
-    console.log(req.body)
+    console.log('app js : ', req.body)
     //console.log(req)
     next();
 });
@@ -33,7 +37,7 @@ const likeRoutes = require("./routes/like");
 app.use('api/post/:memeId/like', likeRoutes);
 
 const commentRoutes = require("./routes/like");
-app.use('api/post/', commentRoutes);
+app.use('api/post/:memeId/', commentRoutes);
 
 app.use('/images', express.static(path.join(__dirname, 'images')));
 

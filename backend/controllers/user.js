@@ -84,16 +84,14 @@ exports.getOneUser = (req, res) => {
 
 // Mettre à jour un utilisateur par sa pk
 exports.update = (req, res) => {
-    const headerAuth = req.headers["authorization"];
-    const userId = utils.getUserId(headerAuth);
-
-    if (userId === req.params.id) {
+    if (req.auth.userId === parseInt(req.params.id)) {
+        console.log(req.params.id)
         const userObject = req.file ?
             {
                 ...req.body.user,
                 avatarUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
             } : {...req.body};
-
+        console.log(req.body)
         User.update({...userObject, id: req.params.id}, {where: {id: req.params.id}})
             .then(() => res.status(200).json({message: 'User updated successfully!'}))
             .catch(error => res.status(400).json({error}));

@@ -1,63 +1,57 @@
 <template>
     <div class="form--card">
-        <div class="post--form">
-            <div class="card-container">
-                <h2>Modification</h2>
-                <form class="form" @submit.prevent="updateUser">
-                    <div class="form-group">
-                        <input v-model="input.email" :autocomplete="email" :placeholder="email" aria-label="Email"
-                               class="input-field" type="email"/>
-                    </div>
-                    <div class="form-group">
-                        <input v-model="input.pseudo" :autocomplete="pseudo" :placeholder="pseudo" aria-label="Pseudo"
-                               class="input-field" type="text"/>
-                    </div>
-                    <div class="form-group upload-image">
-                        <img :src="avatarUrl" alt="Avatar utilisateur">
-                        <a class="btn btn--upload" @click="onPickFile">Changer mon avatar</a>
-                        <input
-                            id="avatarUrl"
-                            ref="fileInput"
-                            accept="images/*"
-                            style="display: none"
-                            type="file"
-                            @change="onFilePicked"/>
-                    </div>
-                    <div class="form-group">
-                        <input v-model="input.password" aria-label="mot de passe" class="input-field"
-                               placeholder="Saisir un nouveau mot de passe" type="password"/>
-                    </div>
-                    <div>
-                        <button class="btn" type="submit">Modifier</button>
-                    </div>
-                </form>
-            </div>
-
+        <div class="card-container">
+            <h2>Modification</h2>
+            <form class="form" @submit.prevent="updateMeme">
+                <div class="form-group">
+                    <input v-model="input.email" :autocomplete="email" :placeholder="email" aria-label="Email"
+                           class="input-field" type="email"/>
+                </div>
+                <div class="form-group">
+                    <input v-model="input.pseudo" :autocomplete="pseudo" :placeholder="pseudo" aria-label="Pseudo"
+                           class="input-field" type="text"/>
+                </div>
+                <div class="form-group upload-image">
+                    <img :src="fileUrl" alt="Meme">
+                    <a class="btn btn--upload" @click="onPickFile">Changer mon avatar</a>
+                    <input
+                        id="avatarUrl"
+                        ref="fileInput"
+                        accept="images/*"
+                        style="display: none"
+                        type="file"
+                        @change="onFilePicked"/>
+                </div>
+                <div class="form-group">
+                    <input v-model="input.password" aria-label="mot de passe" class="input-field"
+                           placeholder="Saisir un nouveau mot de passe" type="password"/>
+                </div>
+                <div>
+                    <button class="btn" type="submit">Modifier</button>
+                </div>
+            </form>
         </div>
+
     </div>
 </template>
 
 <script>
 export default {
-    name: 'EditAccount',
+    name: 'EditPost',
     components: {},
     data() {
         return {
             userId: localStorage.getItem('userId'),
-            pseudo: "",
-            email: "",
-            avatarUrl: "",
+            title: "",
+            fileUrl: "",
             input: {
-                pseudo: "",
-                email: "",
-                avatarUrl: "",
-                password: "",
-                userId: "",
+                title: "",
+                fileUrl: "",
             },
         }
     },
     mounted() { //Récuperation des infos utilisateurs
-        const url = "http://127.0.0.1:3000/api/users/" + this.userId;
+        const url = "http://127.0.0.1:3000/api/posts/" + $route.params.id;
         const options = {
             method: 'GET',
             headers: {
@@ -75,8 +69,8 @@ export default {
             .catch(error => console.error(error));
     },
     methods: {
-        updateUser() { //Fonction de mise à jour de l'utilisateur
-            let input = document.getElementById('avatarUrl');
+        updateMeme() { //Fonction de mise à jour de l'utilisateur
+            let input = document.getElementById('fileUrl');
             console.log(input.files[0])
             let formData = new FormData();
             formData.append('pseudo', this.input.pseudo || this.pseudo);
@@ -123,12 +117,6 @@ export default {
 
 }
 </script>
+<style scoped>
 
-<style lang="scss">
-@import "../assets/css/general.scss";
-
-.avatar img {
-    width: 35%;
-    border-radius: 20px;
-}
 </style>

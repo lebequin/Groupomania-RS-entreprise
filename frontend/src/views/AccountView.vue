@@ -61,6 +61,7 @@ export default {
 
             if (window.confirm('Voulez-vous vraiment supprimer le compte ?')) {
                 const url = `http://localhost:3000/api/users/${userId}`;
+                console.log(url);
                 const options = {
                     method: "DELETE",
                     headers: {

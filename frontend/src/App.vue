@@ -9,7 +9,7 @@
                 <router-link v-if="!token" to="/signup">Inscription</router-link>
                 <router-link v-show="token" to="/post">Publier</router-link>
                 <router-link v-show="token" to="/account">Mon compte</router-link>
-                <router-link v-show="token" to="/logout" @click="deconnexion">Déconnexion</router-link>
+                <router-link v-show="token" to="/login" @click="deconnexion">Déconnexion</router-link>
             </nav>
 
         </div>
