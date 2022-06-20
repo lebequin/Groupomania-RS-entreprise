@@ -6,9 +6,6 @@ const likeCtrl = require('../controllers/like');
 const auth = require('../middleware/auth');
 
 // like a meme ✅
-router.post('/', auth, likeCtrl.likeMeme);
-// get list of most liked meme ✅
-router.get('/', auth, likeCtrl.getNumberLikeOnMeme);
-
+router.post('/:memeId', auth, likeCtrl.likeMeme);
 
 module.exports = router

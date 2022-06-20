@@ -17,7 +17,7 @@ app.use((req, res, next) => {
     res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin')
     next();
 });
-app.use(express.urlencoded({extended: true}));
+app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 const userRoutes = require("./routes/user");
@@ -28,15 +28,15 @@ const postRoutes = require("./routes/meme");
 app.use('/api/post', postRoutes);
 
 const likeRoutes = require("./routes/like");
-app.use('api/post/:memeId/like', likeRoutes);
+app.use('/api/post/like', likeRoutes);
 
 const commentRoutes = require("./routes/like");
-app.use('api/post/:memeId/', commentRoutes);
+app.use('/api/post/comment', commentRoutes);
 
 app.use('/images', express.static(path.join(__dirname, 'images')));
 
 const db = require("./models");
-db.sequelize.sync({force: false}).then(() => {
+db.sequelize.sync({ force: false }).then(() => {
     console.log("Database connection established");
 });
 

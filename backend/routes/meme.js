@@ -9,7 +9,9 @@ const multer = require('../middleware/multer-config')
 // Create a meme ✅
 router.post('/', auth, multer, memeCtrl.createMeme);
 // Find a meme by pk ✅
-router.get('/:id', auth, memeCtrl.findMemeById);
+//router.get('/:id', auth, memeCtrl.findMemeById);
+router.get('/:id', auth, memeCtrl.getOneMeme);
+
 // Update a meme by pk ✅
 router.put('/:id', auth, multer, memeCtrl.updateMeme);
 // Delete a meme by pk ✅

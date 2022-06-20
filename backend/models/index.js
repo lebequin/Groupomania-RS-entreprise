@@ -35,7 +35,6 @@ db.meme.belongsTo(db.user, {
     },
     onDelete: 'CASCADE',
 });
-db.meme.hasMany(db.like, { as: "likes" });
 db.like.belongsTo(db.user, {
     foreignKey: {
         allowNull: false,
@@ -44,6 +43,7 @@ db.like.belongsTo(db.user, {
     onDelete: 'CASCADE',
     as: "user",
 });
+db.meme.hasMany(db.like, { as: "likes" });
 db.like.belongsTo(db.meme, {
     foreignKey: {
         allowNull: false,
@@ -51,6 +51,7 @@ db.like.belongsTo(db.meme, {
     },
     onDelete: 'CASCADE',
 });
+db.meme.hasMany(db.comment, { as: "comments" });
 db.comment.belongsTo(db.meme, {
     foreignKey: {
         allowNull: false,

@@ -14,14 +14,13 @@ module.exports = (req, res, next) => {
                 id: userId,
             },
         }).then(user => {
-
             if (!user) {
-                return res.status(401).json({message: `Id : ${userId} does not exist.`});
-            } else if (req.body.userId && req.body.userId !== userId) {
-                return res.status(401).json({message: "Your not authorized"});
+                return res.status(401).json({ message: `Id : ${userId} does not exist.` });
+            } else if (parseInt(req.body.userId) && parseInt(req.body.userId) !== parseInt(userId)) {
+                return res.status(401).json({ message: "Your not authorized" });
             } else {
-                req.auth = {userId};
-                req.admin = {isAdmin: user.isAdmin};
+                req.auth = { userId };
+                req.admin = { isAdmin: user.isAdmin };
                 next();
             }
         });

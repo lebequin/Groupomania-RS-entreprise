@@ -5,7 +5,7 @@
                 <img :src="avatarUrl" alt="avatar utilisateur" class="user__avatar">
                 <p class="user__pseudo">{{ pseudo }}</p>
             </div>
-            <div v-if="meme.userId == userId || this.isAdmin == 'true' " class="params__meme">
+            <div v-if="meme.userId == userId || this.isAdmin == 'true'" class="params__meme">
                 <div class="params__button" @click="updateMeme(meme.id)">
                     <i aria-hidden="true" class="fa fa-pencil"></i>
                 </div>
@@ -21,25 +21,37 @@
         <div class="footer__meme">
             <p v-if="meme.updatedAt > meme.createdAt">Publié :{{ meme.createdAt }}</p>
             <p v-else>Mis à jour :{{ meme.updatedAt }}</p>
-            <a @click="likeMeme(meme.id)">
-                <i v-if="isLike = false" aria-hidden="true" class="fa fa-heart"></i>
-                <i v-else aria-hidden="true" class="fa-heart" style="color:red"></i>
-            </a>
+            <div class="like-container">
+                <a @click="likeMeme(meme.id)">
+                    <i v-if="isLike = false" aria-hidden="true" class="fa fa-heart"></i>
+                    <i v-else aria-hidden="true" class="fa fa-heart" style="color:red"></i>
+                </a>
+                <p>{{ meme.likes.length }}</p>
+            </div>
+            <div class="comment-container">
+                <a v-on:click="isHidden = !isHidden"><i class="fa fa-comment"></i></a>
+                <p>{{ meme.comments.length }}</p>
+            </div>
         </div>
-        <div class="answer-container">
-
+        <div v-if="!isHidden" class="answer-container">
+            <ReplyMemeComponent :memeId="meme.id" />
         </div>
     </div>
 </template>
 
 <script>
+import ReplyMemeComponent from './ReplyMemeComponent.vue';
 export default {
     name: "PostComponent",
+    components: {
+        ReplyMemeComponent,
+    },
     data() {
         return {
             userId: localStorage.getItem('userId'),
             isAdmin: localStorage.getItem('isAdmin'),
             isLike: false,
+            isHidden: true,
             pseudo: "",
             avatarUrl: "",
             memes: [],
@@ -58,6 +70,7 @@ export default {
             .then(response => response.json())
             .then(data => {
                 this.memes = data;
+                console.log(data)
             })
             .catch(error => console.log(error));
     },
@@ -85,12 +98,12 @@ export default {
             });
         },
         likeMeme(memeId) {
-            const url = "http://127.0.0.1:3000/api/post/" + memeId + '/like';
+            const url = "http://127.0.0.1:3000/api/post/like/" + memeId;
             const options = {
                 method: "POST",
                 body: JSON.stringify({
                     userId: this.userId,
-                    isLike: true,
+                    isLike: !this.isLike,
                     memeId: memeId,
                 }),
                 headers: {
@@ -189,5 +202,13 @@ export default {
 .footer__meme {
     display: flex;
     justify-content: space-between;
+}
+
+.like-container {
+    display: flex;
+}
+
+.comment-container {
+    display: flex;
 }
 </style>
