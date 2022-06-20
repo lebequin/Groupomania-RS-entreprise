@@ -21,6 +21,13 @@
         <div class="footer__meme">
             <p v-if="meme.updatedAt > meme.createdAt">Publié :{{ meme.createdAt }}</p>
             <p v-else>Mis à jour :{{ meme.updatedAt }}</p>
+            <a @click="likeMeme(meme.id)">
+                <i v-if="isLike = false" aria-hidden="true" class="fa fa-heart"></i>
+                <i v-else aria-hidden="true" class="fa-heart" style="color:red"></i>
+            </a>
+        </div>
+        <div class="answer-container">
+
         </div>
     </div>
 </template>
@@ -32,6 +39,7 @@ export default {
         return {
             userId: localStorage.getItem('userId'),
             isAdmin: localStorage.getItem('isAdmin'),
+            isLike: false,
             pseudo: "",
             avatarUrl: "",
             memes: [],
@@ -49,9 +57,7 @@ export default {
         fetch(url, options)
             .then(response => response.json())
             .then(data => {
-                console.log(data)
                 this.memes = data;
-                console.log('memes', this.memes)
             })
             .catch(error => console.log(error));
     },
@@ -67,8 +73,8 @@ export default {
             };
             fetch(url, options)
                 .then(response => response.json())
-                .then(memes => {
-                    this.memes = memes;
+                .then(data => {
+                    this.memes = data;
                     window.location.reload();
                 })
                 .catch(error => console.log(error));
@@ -78,6 +84,27 @@ export default {
                 path: "/edit-post/" + memeId
             });
         },
+        likeMeme(memeId) {
+            const url = "http://127.0.0.1:3000/api/post/" + memeId + '/like';
+            const options = {
+                method: "POST",
+                body: JSON.stringify({
+                    userId: this.userId,
+                    isLike: true,
+                    memeId: memeId,
+                }),
+                headers: {
+                    "Content-type": "application/json; charset=UTF-8",
+                    "Authorization": "Bearer " + localStorage.getItem("token"),
+                },
+            };
+            fetch(url, options)
+                .then(response => response.json())
+                .then(json => {
+                    console.log('donnée envoyées : ', json)
+                })
+                .catch(error => console.log(error));
+        }
     },
     created: function () {
         const url = "http://localhost:3000/api/users/" + this.userId;
@@ -90,7 +117,6 @@ export default {
         fetch(url, options)
             .then(response => response.json())
             .then(data => {
-                console.log('curent user : ', data)
                 this.pseudo = data.pseudo;
                 this.avatarUrl = data.avatarUrl;
             })
@@ -160,4 +186,8 @@ export default {
     justify-content: space-between;
 }
 
+.footer__meme {
+    display: flex;
+    justify-content: space-between;
+}
 </style>

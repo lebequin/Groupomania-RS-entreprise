@@ -27,6 +27,7 @@
                     </div>
                     <button class="btn btn--upload" @click="onPickFile">Choisir mon avatar</button>
                     <input
+                        id="avatarUrl"
                         ref="fileInput"
                         accept="image/*"
                         style="display: none"
@@ -66,16 +67,19 @@ export default {
     },
     methods: {
         register() {
+            let input = document.getElementById('avatarUrl');
+            let formData = new FormData();
+            formData.append('pseudo', this.pseudo);
+            formData.append('email', this.email);
+            formData.append('avatarUrl', input.files[0]);
+            formData.append('email', this.password);
+            formData.append('email', this.is_admin);
+
             fetch('http://127.0.0.1:3000/api/users/signup', {
                 // Adding method type
                 method: "POST",
                 // Adding body or contents to send
-                body: JSON.stringify({
-                    pseudo: this.pseudo,
-                    email: this.email,
-                    avatarUrl: this.avatarUrl,
-                    password: this.password,
-                }),
+                body: formData,
                 // Adding headers to the request
                 headers: {"Content-type": "application/json; charset=UTF-8"}
             })

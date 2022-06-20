@@ -2,29 +2,18 @@
     <div class="container">
         <div class="card-container">
             <h1 class="m-2">Publier un Meme</h1>
-            <form class="form" @submit.prevent="post">
+            <form class="form">
                 <div class="form-group">
                     <label class="text-left" for="title">Titre</label>
-                    <input
-                        id="title"
-                        v-model="title"
-                        class="input-field"
-                        placeholder="Entrer un titre"
-                        type="text"
-                    />
+                    <input id="title" v-model="title" class="input-field" placeholder="Entrer un titre" type="text"/>
                 </div>
                 <div class="form-group upload-image">
                     <img :src="fileUrl" alt="" class="meme-preview">
                     <button class="btn btn--upload" @click="onPickFile">Choisir mon meme</button>
-                    <input
-                        id="fileUrl"
-                        ref="fileInput"
-                        accept="image/*"
-                        style="display: none"
-                        type="file"
-                        @change="onFilePicked"/>
+                    <input id="fileUrl" ref="fileInput" accept="image/*" style="display: none" type="file"
+                           @change="onFilePicked"/>
                 </div>
-                <button class="btn btn-primary m-3" type="submit">Publier</button>
+                <button class="btn btn-primary m-3" type="submit" @click.prevent="post">Publier</button>
             </form>
         </div>
     </div>
@@ -62,9 +51,8 @@ export default {
                 // Displaying results to console
                 .then(json => {
                     console.log('donnée envoyées : ', json)
+                    this.$router.push("/")
                 })
-
-                .then(() => this.$router.push("/post"))
                 .catch((err) => console.log(err));
         },
         onPickFile() {
@@ -80,6 +68,7 @@ export default {
             fileReader.readAsDataURL(files[0])
             this.image = files[0]
         },
+        
     }
 };
 </script>

@@ -20,12 +20,6 @@ app.use((req, res, next) => {
 app.use(express.urlencoded({extended: true}));
 app.use(express.json());
 
-app.use((req, res, next) => {
-    console.log('app js : ', req.body)
-    //console.log(req)
-    next();
-});
-
 const userRoutes = require("./routes/user");
 const apiRoot = '/api/users'
 app.use(apiRoot, userRoutes);

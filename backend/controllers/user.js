@@ -91,7 +91,6 @@ exports.update = (req, res) => {
                 ...req.body.user,
                 avatarUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
             } : {...req.body};
-        console.log(req.body)
         User.update({...userObject, id: req.params.id}, {where: {id: req.params.id}})
             .then(() => res.status(200).json({message: 'User updated successfully!'}))
             .catch(error => res.status(400).json({error}));
@@ -103,8 +102,6 @@ exports.update = (req, res) => {
 
 // Supprimer l'utilisateur par sa pk
 exports.delete = (req, res) => {
-    const headerAuth = req.headers["authorization"];
-    const userId = utils.getUserId(headerAuth);
     const imageUrl = req.body.avatarUrl;
 
     //Suppression de l'utilisateur uniquement par un admin
@@ -112,7 +109,7 @@ exports.delete = (req, res) => {
         res.status(401).send('You do not have permission to delete this user')
     else {
         User.destroy({
-            where: {id: userId}
+            where: {id: req.auth.userId}
         })
             .then(num => {
                 console.log(num)
@@ -131,7 +128,7 @@ exports.delete = (req, res) => {
             })
             .catch(err => {
                 res.status(500).send({
-                    message: "Could not delete User with id=" + id
+                    message: "Could not delete User :" + err
                 });
             });
     }

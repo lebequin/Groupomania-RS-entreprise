@@ -6,15 +6,12 @@ const Meme = db.meme;
 
 // Création d'un meme par un utilisateur connecté
 exports.createMeme = (req, res, next) => {
-    const id = req.params.id;
-    const headerAuth = req.headers["authorization"];
-    const userId = utils.getUserId(headerAuth);
-
-    if( userId === id ) {
+    const userId = req.auth.userId
+    if (userId) {
         return Meme.create({
             title: req.body.title,
-            fileUrl: `${req.protocol}://${req.get('host')}/images/${req.body.fileUrl}`,
-            userID: userId,
+            fileUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`,
+            userId: userId,
         })
             .then(meme => {
                 console.log("Création du meme: " + meme.title);
@@ -25,15 +22,14 @@ exports.createMeme = (req, res, next) => {
                     message: "Error creating Meme with title=" + req.body.title
                 });
             });
-    }
-    else {
+    } else {
         res.status(401).send('You do not have permission to create a Meme')
     }
 };
 
 // recherche d'un meme par pk
 exports.findMemeById = (id) => {
-    return Meme.findByPk(id, { include: ["user"] })
+    return Meme.findByPk(id, {include: ["user"]})
         .then((meme) => {
             return meme;
         })
@@ -44,11 +40,10 @@ exports.findMemeById = (id) => {
 
 // Mise un jour d'un meme et suppression de l'image en base si l'image envoyée est différente
 exports.updateMeme = (req, res) => {
+    const userId = req.auth.userId;
     const id = req.params.id;
-    const headerAuth = req.headers["authorization"];
-    const userId = utils.getUserId(headerAuth);
 
-    if( userId === id ) {
+    if (userId) {
         // Si un fichier est envoyé on supprime l'ancien pour ajouter le nouveau en base
         if (req.file) {
             Meme.findOne({id: req.params.id}).then(meme => {
@@ -65,7 +60,7 @@ exports.updateMeme = (req, res) => {
                             if (num === 1) {
                                 res.send({message: "Meme was updated successfully."});
                             } else {
-                                res.send({ message: `Cannot update Meme with id=${id}. Maybe meme was not found or req.body is empty!`});
+                                res.send({message: `Cannot update Meme with id=${id}. Maybe meme was not found or req.body is empty!`});
                             }
                         })
                         .catch(err => {
@@ -80,7 +75,7 @@ exports.updateMeme = (req, res) => {
                 where: {id: id}
             })
                 .then(num => {
-                    if (num === 1) {
+                    if (num == 1) {
                         res.send({message: "Meme was updated successfully."});
                     } else {
                         res.send({message: `Cannot update Meme with id=${id}. Maybe Meme was not found or req.body is empty!`});
@@ -92,58 +87,44 @@ exports.updateMeme = (req, res) => {
                     });
                 });
         }
-    }
-    else {
+    } else {
         res.status(401).send('You do not have permission to update')
     }
 };
 
-// Suppression du meme par id et suppression de l'image en base
 exports.deleteMeme = (req, res, next) => {
-    const id = req.params.id;
-    const fileUrl = req.body.fileUrl;
-
-    const headerAuth = req.headers["authorization"];
-    const userId = utils.getUserId(headerAuth);
-
-    // Vérification que c'est bien l'utilisateur connecté ou un admin pour supprimer le meme
-    if( userId === req.params.id || req.admin.isAdmin === true) {
-        Meme.destroy({
-            where: {id: id}
-        })
-            .then(num => {
-                // Si la suppression s'est bien passé on supprime l'image de la base
-                if (num === 1) {
-                    const filename = fileUrl.split('/images/')[1];
-                    fs.unlinkSync(`images/${filename}`);
-                    res.status(200).send({
-                        message: "Meme was deleted successfully!"
-                    });
-                } else {
-                    res.status(400).send({
-                        message: `Cannot delete Meme with id=${id}. Maybe Meme was not found!`
-                    });
+    Meme.findOne({where: {id: req.params.id}})
+        .then(meme => {
+            if (meme.userId === req.auth.userId || req.auth.isAdmin) {
+                if (meme.fileUrl === null) { //Suppression du meme sans image
+                    Meme.destroy({where: {id: req.params.id}})
+                        .then(() => res.status(201).json({message: 'Meme supprimé !'}))
+                        .catch(error => res.status(400).json({error, message: error.message}));
+                } else { //Suppression du meme avec image
+                    const filename = meme.fileUrl.split('/images/')[1];
+                    fs.unlink(`images/${filename}`, () =>
+                        Meme.destroy({where: {id: req.params.id}})
+                            .then(() => res.status(200).json({message: 'Meme supprimé !'}))
+                            .catch(error => res.status(400).json({error, message: error.message}))
+                    );
                 }
-            })
-            .catch(err => {
-                res.status(500).send({
-                    message: "Could not delete Meme with id=" + id
-                });
-            });
-    }
-    else {
-        res.status(401).send('You do not have permission to delete')
-    }
+            } else {
+                res.status(401).json({message: 'Vous n\'êtes pas autorisé à supprimer ce meme !'});
+            }
+        })
+        .catch(error => res.status(500).json({error, message: error.message}));
 };
 
 // Récupération de tous les memes par date de création descendante
 exports.getAllMeme = (req, res, next) => {
-    Meme.findAll({order: [
+    Meme.findAll({
+        order: [
             ['createdAt', 'DESC'],
-        ]})
+        ]
+    })
         .then(meme => {
             console.log(meme);
             res.status(200).json({data: meme});
         })
-        .catch(error => res.status(400).json({ error }));
+        .catch(error => res.status(400).json({error}));
 };
