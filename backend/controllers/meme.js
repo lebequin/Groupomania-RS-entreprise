@@ -30,7 +30,7 @@ exports.createMeme = (req, res, next) => {
 exports.getOneMeme = (req, res) => {
     const id = req.params.id;
     console.log(id)
-    Meme.findByPk(id)
+    Meme.findByPk(id, {include: ['likes', 'comments', 'user']})
         .then(data => {
             if (data) {
                 res.status(200).send(data);
@@ -55,7 +55,7 @@ exports.updateMeme = (req, res) => {
     if (userId) {
         // Si un fichier est envoyé on supprime l'ancien pour ajouter le nouveau en base
         if (req.file) {
-            Meme.findOne({ id: req.params.id }).then(meme => {
+            Meme.findOne({id: req.params.id}).then(meme => {
                 const filename = meme.fileUrl.split('/images/')[1];
                 fs.unlink(`images/${filename}`, () => {
                     const memeObject = {
@@ -63,31 +63,31 @@ exports.updateMeme = (req, res) => {
                         fileUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
                     }
                     Meme.update(...memeObject, {
-                        where: { id: id }
+                        where: {id: id}
                     })
                         .then(num => {
                             if (num === 1) {
-                                res.send({ message: "Meme was updated successfully." });
+                                res.send({message: "Meme was updated successfully."});
                             } else {
-                                res.send({ message: `Cannot update Meme with id=${id}. Maybe meme was not found or req.body is empty!` });
+                                res.send({message: `Cannot update Meme with id=${id}. Maybe meme was not found or req.body is empty!`});
                             }
                         })
                         .catch(err => {
-                            res.status(500).send({ message: "Error updating Meme with id=" + id });
+                            res.status(500).send({message: "Error updating Meme with id=" + id});
                         });
                 });
             })
-                .catch(error => res.status(500).json({ error }));
+                .catch(error => res.status(500).json({error}));
         } else {
             // Sinon on modifie juste le meme
             Meme.update(req.body, {
-                where: { id: id }
+                where: {id: id}
             })
                 .then(num => {
                     if (num == 1) {
-                        res.send({ message: "Meme was updated successfully." });
+                        res.send({message: "Meme was updated successfully."});
                     } else {
-                        res.send({ message: `Cannot update Meme with id=${id}. Maybe Meme was not found or req.body is empty!` });
+                        res.send({message: `Cannot update Meme with id=${id}. Maybe Meme was not found or req.body is empty!`});
                     }
                 })
                 .catch(err => {
@@ -102,26 +102,26 @@ exports.updateMeme = (req, res) => {
 };
 
 exports.deleteMeme = (req, res, next) => {
-    Meme.findOne({ where: { id: req.params.id } })
+    Meme.findOne({where: {id: req.params.id}})
         .then(meme => {
             if (meme.userId === req.auth.userId || req.auth.isAdmin) {
                 if (meme.fileUrl === null) { //Suppression du meme sans image
-                    Meme.destroy({ where: { id: req.params.id } })
-                        .then(() => res.status(201).json({ message: 'Meme supprimé !' }))
-                        .catch(error => res.status(400).json({ error, message: error.message }));
+                    Meme.destroy({where: {id: req.params.id}})
+                        .then(() => res.status(201).json({message: 'Meme supprimé !'}))
+                        .catch(error => res.status(400).json({error, message: error.message}));
                 } else { //Suppression du meme avec image
                     const filename = meme.fileUrl.split('/images/')[1];
                     fs.unlink(`images/${filename}`, () =>
-                        Meme.destroy({ where: { id: req.params.id } })
-                            .then(() => res.status(200).json({ message: 'Meme supprimé !' }))
-                            .catch(error => res.status(400).json({ error, message: error.message }))
+                        Meme.destroy({where: {id: req.params.id}})
+                            .then(() => res.status(200).json({message: 'Meme supprimé !'}))
+                            .catch(error => res.status(400).json({error, message: error.message}))
                     );
                 }
             } else {
-                res.status(401).json({ message: 'Vous n\'êtes pas autorisé à supprimer ce meme !' });
+                res.status(401).json({message: 'Vous n\'êtes pas autorisé à supprimer ce meme !'});
             }
         })
-        .catch(error => res.status(500).json({ error, message: error.message }));
+        .catch(error => res.status(500).json({error, message: error.message}));
 };
 
 // Récupération de tous les memes par date de création descendante
@@ -131,11 +131,11 @@ exports.getAllMeme = (req, res, next) => {
             ['createdAt', 'DESC'],
 
         ],
-        include: ['likes', 'comments']
+        include: ['likes', 'comments', 'user']
     })
         .then(meme => {
             console.log(meme);
-            res.status(200).json({ data: meme });
+            res.status(200).json({data: meme});
         })
-        .catch(error => res.status(400).json({ error }));
+        .catch(error => res.status(400).json({error}));
 };

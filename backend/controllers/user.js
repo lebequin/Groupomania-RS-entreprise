@@ -11,13 +11,13 @@ const TOKEN = process.env.TOKEN;
 
 // Création et enregistrement d'un utilisateur
 exports.signup = (req, res) => {
-    let avatarUrl = null;
+    let file = null;
     utils.verifySignup(req, res)
     logger.info('Enter signup function');
 
     if (req.file) {
-        avatarUrl = `${req.protocol}://${req.get('host')}/images/${req.body.avatarUrl}`
-        logger.log('avatar file: ' + avatarUrl)
+        file = `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
+        console.log('avatar file: ' + file)
     }
     // Chiffrage du mot de passe avec bcrypt et un salage de 10
     bcrypt.hash(req.body.password, 10)
@@ -25,7 +25,7 @@ exports.signup = (req, res) => {
             const user = {
                 email: req.body.email,
                 pseudo: req.body.pseudo,
-                avatarUrl: req.body.avatarUrl,
+                avatarUrl: file,
                 password: hash,
                 isAdmin: req.body.isAdmin,
             }

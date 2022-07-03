@@ -3,7 +3,7 @@
         <div id="register" class="col-md-12">
             <div class="card-container">
                 <h1 class="m-2">Créer votre compte</h1>
-                <form class="form" @submit.prevent="register">
+                <form class="form">
                     <div class="form-group">
                         <label class="text-left" for="pseudo">Pseudo</label>
                         <input
@@ -25,6 +25,7 @@
                             type="email"
                         />
                     </div>
+                    <img :src="avatarUrl" alt="" class="avatar-preview">
                     <button class="btn btn--upload" @click="onPickFile">Choisir mon avatar</button>
                     <input
                         id="avatarUrl"
@@ -43,7 +44,7 @@
                             type="password"
                         />
                     </div>
-                    <button class="btn btn-primary m-3" type="submit">
+                    <button class="btn btn-primary m-3" type="submit" @click.prevent="register">
                         Créez votre compte
                     </button>
                 </form>
@@ -62,37 +63,30 @@ export default {
             email: "",
             avatarUrl: "",
             password: "",
-            is_admin: ""
         };
     },
     methods: {
         register() {
             let input = document.getElementById('avatarUrl');
             let formData = new FormData();
-            formData.append('pseudo', this.pseudo);
             formData.append('email', this.email);
-            formData.append('avatarUrl', input.files[0]);
-            formData.append('email', this.password);
-            formData.append('email', this.is_admin);
+            formData.append('pseudo', this.pseudo);
+            formData.append('image', input.files[0]);
+            formData.append('password', this.password);
+            formData.append('is_admin', false);
 
             fetch('http://127.0.0.1:3000/api/users/signup', {
-                // Adding method type
                 method: "POST",
-                // Adding body or contents to send
                 body: formData,
-                // Adding headers to the request
-                headers: {"Content-type": "application/json; charset=UTF-8"}
             })
-
                 // Converting to JSON
                 .then(response => response.json())
 
                 // Displaying results to console
                 .then(json => {
                     console.log('donnée envoyées : ', json)
+                    this.$router.push("/login")
                 })
-
-                .then(() => this.$router.push("/users"))
                 .catch((err) => console.log(err));
         },
         onPickFile() {
@@ -128,6 +122,12 @@ export default {
     text-align: left;
 }
 
+.avatar-preview {
+    max-width: 150px;
+    object-fit: cover;
+    border-radius: 20px;
+    margin: 1em 0;
+}
 
 .form > div {
     width: 100%;

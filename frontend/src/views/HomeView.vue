@@ -9,7 +9,7 @@
 
 <script>
 
-import PostComponent from "@/components/PostComponent";
+import PostComponent from "@/components/PostListComponent";
 
 export default {
     name: "HomeView",
@@ -25,7 +25,3 @@ export default {
 
 }
 </script>
-
-<style scoped>
-
-</style>

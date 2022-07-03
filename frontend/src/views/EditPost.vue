@@ -5,13 +5,13 @@
             <form class="form" @submit.prevent="updateMeme">
                 <div class="form-group">
                     <input v-model="input.title" :autocomplete="title" :placeholder="title" aria-label="title"
-                        class="input-field" type="text" />
+                           class="input-field" type="text"/>
                 </div>
                 <div class="form-group upload-image">
                     <img :src="fileUrl" alt="Meme">
                     <a class="btn btn--upload" @click="onPickFile">Changer mon meme</a>
                     <input id="fileUrl" ref="fileInput" accept="images/*" style="display: none" type="file"
-                        @change="onFilePicked" />
+                           @change="onFilePicked"/>
                 </div>
                 <div>
                     <button class="btn" type="submit">Modifier</button>
@@ -38,7 +38,6 @@ export default {
         }
     },
     mounted() { //Récuperation des infos utilisateurs
-        console.log(this.id)
         const url = "http://localhost:3000/api/post/" + this.id;
         const options = {
             method: "GET",

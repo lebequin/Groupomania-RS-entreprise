@@ -1,64 +1,70 @@
 <template>
-    <div v-for="meme in memes.data" :key="meme.memeId" class="meme__container">
+    <div class="meme__container">
         <div class="header__meme">
             <div class="header_user">
-                <img :src="avatarUrl" alt="avatar utilisateur" class="user__avatar">
-                <p class="user__pseudo">{{ pseudo }}</p>
+                <img :src="user.avatarUrl" alt="avatar utilisateur" class="user__avatar">
+                <div class="user__pseudo">
+                    <p>{{ user.pseudo }}</p>
+                    <i v-if="isAdmin = 1" aria-hidden="true" class="fa fa-id-badge admin-badge"></i>
+                </div>
             </div>
-            <div v-if="meme.userId == userId || this.isAdmin == 'true'" class="params__meme">
-                <div class="params__button" @click="updateMeme(meme.id)">
+            <div v-if="user.userId == userId || user.isAdmin == 'true'" class="params__meme">
+                <div class="params__button" @click="updateMeme(id)">
                     <i aria-hidden="true" class="fa fa-pencil"></i>
                 </div>
-                <div class="params__button" @click="deleteMeme(meme.id)">
+                <div class="params__button" @click="deleteMeme(id)">
                     <i aria-hidden="true" class="fa fa-trash"></i>
                 </div>
             </div>
         </div>
         <div class="body__meme">
-            <h2 class="meme__title">{{ meme.title }}</h2>
-            <img :src="meme.fileUrl" alt="image" class="meme__img">
+            <h2 class="meme__title">{{ title }}</h2>
+            <img :src="fileUrl" alt="image" class="meme__img">
         </div>
         <div class="footer__meme">
-            <p v-if="meme.updatedAt > meme.createdAt">Publié :{{ meme.createdAt }}</p>
-            <p v-else>Mis à jour :{{ meme.updatedAt }}</p>
+            <p v-if="updatedAt > createdAt">Publié :{{ createdAt }}</p>
+            <p v-else>Mis à jour :{{ updatedAt }}</p>
             <div class="like-container">
-                <a @click="likeMeme(meme.id)">
+                <a @click="likeMeme(id)">
                     <i v-if="isLike = false" aria-hidden="true" class="fa fa-heart"></i>
                     <i v-else aria-hidden="true" class="fa fa-heart" style="color:red"></i>
                 </a>
-                <p>{{ meme.likes.length }}</p>
+                <p>{{ likes.length }}</p>
             </div>
             <div class="comment-container">
                 <a v-on:click="isHidden = !isHidden"><i class="fa fa-comment"></i></a>
-                <p>{{ meme.comments.length }}</p>
+                <p>{{ comments.length }}</p>
             </div>
         </div>
         <div v-if="!isHidden" class="answer-container">
-            <ReplyMemeComponent :memeId="meme.id" />
+            <ReplyMemeComponent :memeId="id"/>
         </div>
     </div>
 </template>
 
 <script>
-import ReplyMemeComponent from './ReplyMemeComponent.vue';
+import ReplyMemeComponent from '../components/ReplyMemeComponent.vue';
+
 export default {
-    name: "PostComponent",
+    name: "PostDetails",
     components: {
         ReplyMemeComponent,
     },
     data() {
         return {
             userId: localStorage.getItem('userId'),
-            isAdmin: localStorage.getItem('isAdmin'),
-            isLike: false,
-            isHidden: true,
-            pseudo: "",
-            avatarUrl: "",
-            memes: [],
+            id: window.location.href.split("/").slice(-1)[0],
+            title: "",
+            fileUrl: "",
+            createdAt: "",
+            updatedAt: "",
+            user: [],
+            likes: [],
+            comments: []
         }
     },
     mounted() {
-        const url = "http://localhost:3000/api/post";
+        const url = "http://localhost:3000/api/post/" + this.id;
         const options = {
             method: "GET",
             headers: {
@@ -69,8 +75,16 @@ export default {
         fetch(url, options)
             .then(response => response.json())
             .then(data => {
-                this.memes = data;
-                console.log(data)
+                console.log(data);
+                this.title = data.title;
+                this.fileUrl = data.fileUrl;
+                this.createdAt = data.createdAt;
+                this.updatedAt = data.updatedAt;
+                this.user = data.user;
+                this.likes = data.likes;
+                this.comments = data.comments;
+                console.log(this.user.avatarUrl);
+
             })
             .catch(error => console.log(error));
     },
@@ -155,12 +169,6 @@ export default {
     }
 }
 
-.user__avatar {
-    border-radius: 20px;
-    max-width: 50px;
-    margin-right: 20px;
-}
-
 .header__meme {
     display: flex;
 }
@@ -210,5 +218,34 @@ export default {
 
 .comment-container {
     display: flex;
+}
+
+.user__pseudo {
+    text-align: left;
+}
+
+.admin-badge {
+    color: #00b06b;
+    padding: 3px 14px;
+    font-size: 25px;
+    margin-bottom: 2px;
+}
+
+.user__pseudo {
+    text-align: left;
+    display: flex;
+    align-items: center;
+
+    p {
+        margin: 8px 0;
+    }
+}
+
+.user__avatar {
+    max-width: 65px;
+    object-fit: cover;
+    height: 65px;
+    border-radius: 20px;
+    margin-right: 20px;
 }
 </style>
