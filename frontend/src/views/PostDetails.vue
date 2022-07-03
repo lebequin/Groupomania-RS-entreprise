@@ -5,10 +5,10 @@
                 <img :src="user.avatarUrl" alt="avatar utilisateur" class="user__avatar">
                 <div class="user__pseudo">
                     <p>{{ user.pseudo }}</p>
-                    <i v-if="isAdmin = 1" aria-hidden="true" class="fa fa-id-badge admin-badge"></i>
+                    <i v-if="user.isAdmin == 1" aria-hidden="true" class="fa fa-id-badge admin-badge"></i>
                 </div>
             </div>
-            <div v-if="user.userId == userId || user.isAdmin == 'true'" class="params__meme">
+            <div v-if="user.userId == userId || user.isAdmin == true" class="params__meme">
                 <div class="params__button" @click="updateMeme(id)">
                     <i aria-hidden="true" class="fa fa-pencil"></i>
                 </div>
@@ -22,20 +22,22 @@
             <img :src="fileUrl" alt="image" class="meme__img">
         </div>
         <div class="footer__meme">
-            <p v-if="updatedAt > createdAt">Publié :{{ createdAt }}</p>
-            <p v-else>Mis à jour :{{ updatedAt }}</p>
-            <div class="like-container">
-                <a @click="likeMeme(id)">
-                    <i v-if="isLike = false" aria-hidden="true" class="fa fa-heart"></i>
-                    <i v-else aria-hidden="true" class="fa fa-heart" style="color:red"></i>
-                </a>
-                <p>{{ likes.length }}</p>
-            </div>
-            <div class="comment-container">
-                <a v-on:click="isHidden = !isHidden"><i class="fa fa-comment"></i></a>
-                <p>{{ comments.length }}</p>
+            <p>Publié :{{ createdAt }}</p>
+            <div class="interact">
+                <div class="like-container">
+                    <a @click="likeMeme(id)">
+                        <i v-if="likes.isLike == false" aria-hidden="true" class="fa fa-heart"></i>
+                        <i v-else aria-hidden="true" class="fa fa-heart" style="color:red"></i>
+                    </a>
+                    <p>{{ likes.length }}</p>
+                </div>
+                <div class="comment-container">
+                    <i class="fa fa-comment"></i>
+                    <p>{{ comments.length }}</p>
+                </div>
             </div>
         </div>
+        <ListCommentComponent :comments="comments"/>
         <div v-if="!isHidden" class="answer-container">
             <ReplyMemeComponent :memeId="id"/>
         </div>
@@ -44,11 +46,13 @@
 
 <script>
 import ReplyMemeComponent from '../components/ReplyMemeComponent.vue';
+import ListCommentComponent from "@/components/ListCommentComponent";
 
 export default {
     name: "PostDetails",
     components: {
         ReplyMemeComponent,
+        ListCommentComponent,
     },
     data() {
         return {
@@ -165,8 +169,14 @@ export default {
     }
 
     &__img {
-        max-width: 100%;
+        width: 100%;
+        object-fit: cover;
+
     }
+}
+
+.interact {
+    display: flex;
 }
 
 .header__meme {
@@ -248,4 +258,21 @@ export default {
     border-radius: 20px;
     margin-right: 20px;
 }
+
+.like-container {
+    align-items: center;
+}
+
+.comment-container {
+    align-items: center;
+}
+
+.like-container a {
+    margin: 0 10px;
+}
+
+.comment-container i {
+    margin: 0 10px;
+}
+
 </style>

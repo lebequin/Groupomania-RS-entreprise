@@ -1,14 +1,12 @@
 const db = require("../models");
-const utils = require("../utils");
 const Comment = db.comment;
 const User = db.user;
 
 //Création d'un commentaire
 exports.createComment = (req, res) => {
-    const memeId = req.params.id;
-
+    const memeId = req.params.memeId;
     const comment = {
-        content: req.body.content,
+        message: req.body.message,
         memeId: memeId,
         userId: req.auth.userId,
     };
@@ -20,7 +18,7 @@ exports.createComment = (req, res) => {
 // Mise à jour du commentaire
 exports.updateComment = (req, res) => {
     Comment.findOne({
-        where: {id: req.params.id,},
+        where: {id: req.params.memeId,},
     }).then((comment) => {
         if (!comment)
             return res.status(404).json({message: "Comment not found"});
@@ -32,20 +30,10 @@ exports.updateComment = (req, res) => {
     });
 };
 
-// Obtenir tous les commentaire d'un meme
-exports.getAllCommentsOfMeme = (req, res) => {
-    Comment.findAll({
-        where: {memeId: req.params.memeId,},
-        include: [{model: User,},],
-    })
-        .then((comments) => res.status(200).json(comments))
-        .catch((error) => res.status(400).json({error}));
-};
-
 //Supprimer un commentaire
 exports.deleteComment = (req, res) => {
     Comment.findOne({
-        where: {id: req.params.id},
+        where: {id: req.params.commentId},
     })
         .then((comment) => {
             if (!comment) {

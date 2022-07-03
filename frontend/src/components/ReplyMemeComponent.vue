@@ -1,6 +1,6 @@
 <template>
     <form class="form" @submit.prevent="commentMeme(memeId)">
-        <input id="answerContent" v-model="content" class="input-field" placeholder="Commenter" type="text" />
+        <input id="answerContent" v-model="message" class="input-field" placeholder="Commenter" type="text"/>
         <button class="btn btn-primary" type="submit">Commenter</button>
     </form>
 </template>
@@ -12,7 +12,7 @@ export default {
     data() {
         return {
             userId: localStorage.getItem('userId'),
-            content: '',
+            message: '',
         }
     },
     props: ['memeId'],
@@ -23,7 +23,7 @@ export default {
                 method: "POST",
                 body: JSON.stringify({
                     userId: this.userId,
-                    content: this.content,
+                    message: this.message,
                     memeId: memeId,
                 }),
                 headers: {
@@ -35,6 +35,7 @@ export default {
                 .then(response => response.json())
                 .then(json => {
                     console.log('donnée envoyées : ', json)
+                    window.location.reload()
                 })
                 .catch(error => console.log(error));
         }

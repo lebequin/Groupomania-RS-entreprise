@@ -5,10 +5,10 @@ const auth = require('../middleware/auth');
 const commentCtrl = require('../controllers/comment');
 
 // Create a comment ✅
-router.post('/', auth, commentCtrl.createComment);
+router.post('/:memeId', auth, commentCtrl.createComment);
 // Update a comment by pk ✅
-router.put('/:id', auth, commentCtrl.updateComment);
+router.put('/:commentId', auth, commentCtrl.updateComment);
 // Delete a meme by pk ✅
-router.delete('/:id', auth, commentCtrl.deleteComment);
+router.delete('/:commentId', auth, commentCtrl.deleteComment);
 
 module.exports = router;

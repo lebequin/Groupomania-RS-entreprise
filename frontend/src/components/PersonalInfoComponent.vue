@@ -10,8 +10,10 @@
             <p class="allp">{{ $data.id }}</p>
             <h4>email :</h4>
             <p class="allp">{{ $data.email }}</p>
-            <button class="btn" @click="updateUser">Modifier mes informations</button>
-            <button class="btn--secondary" @click="deleteUser">Supprimer mon compte</button>
+            <div class="action">
+                <button class="btn" @click="updateUser">Modifier mes informations</button>
+                <button class="btn--secondary" @click="deleteUser">Supprimer mon compte</button>
+            </div>
         </div>
     </div>
 </template>
@@ -96,6 +98,11 @@ export default {
     box-shadow: 0px 0px 31px -10px #aaa;
     border-radius: 24px;
     padding: 40px;
+}
+
+.action {
+    display: flex;
+    flex-direction: column;
 }
 
 </style>
