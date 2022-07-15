@@ -104,7 +104,7 @@ exports.updateMeme = (req, res) => {
 exports.deleteMeme = (req, res, next) => {
     Meme.findOne({where: {id: req.params.id}})
         .then(meme => {
-            if (meme.userId === req.auth.userId || req.auth.isAdmin) {
+            if (meme.userId === req.auth.userId || req.admin.isAdmin) {
                 if (meme.fileUrl === null) { //Suppression du meme sans image
                     Meme.destroy({where: {id: req.params.id}})
                         .then(() => res.status(201).json({message: 'Meme supprimé !'}))

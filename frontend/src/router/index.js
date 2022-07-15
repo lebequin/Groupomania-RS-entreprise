@@ -1,5 +1,15 @@
 import {createRouter, createWebHashHistory} from 'vue-router'
 import HomeView from "@/views/HomeView";
+import SignupView from "@/views/SignupView";
+import Login from "@/views/Login";
+
+const isAuthenticated = (to, from, next) => {
+    if (localStorage.getItem('token')) {
+        next();
+    } else {
+        window.location.replace("#/login")
+    }
+};
 
 const routes = [
     {
@@ -10,55 +20,48 @@ const routes = [
     {
         path: '/signup',
         name: 'Inscription',
-        component: () => import(/* webpackChunkName: "about" */ '../views/SignupView.vue')
+        component: SignupView
     },
     {
         path: '/login',
         name: 'Login',
-        // route level code-splitting
-        // this generates a separate chunk (about.[hash].js) for this route
-        // which is lazy-loaded when the route is visited.
-        component: () => import(/* webpackChunkName: "about" */ '../views/Login.vue')
+        component: Login
     },
     {
         path: '/account',
         name: 'Account',
-        // route level code-splitting
-        // this generates a separate chunk (about.[hash].js) for this route
-        // which is lazy-loaded when the route is visited.
-        component: () => import(/* webpackChunkName: "about" */ '../views/AccountView.vue')
+        component: () => import('../views/AccountView.vue'),
+        beforeEnter: isAuthenticated,
     },
     {
         path: '/edit-account',
         name: 'EditAccount',
-        // route level code-splitting
-        // this generates a separate chunk (about.[hash].js) for this route
-        // which is lazy-loaded when the route is visited.
-        component: () => import(/* webpackChunkName: "about" */ '../views/EditAccount.vue')
+        component: () => import('../views/EditAccount.vue'),
+        beforeEnter: isAuthenticated,
+    },
+    {
+        path: '/edit-account/:id',
+        name: 'EditAccount',
+        component: () => import('../views/EditAccount.vue'),
+        beforeEnter: isAuthenticated,
     },
     {
         path: '/post',
         name: 'PostView',
-        // route level code-splitting
-        // this generates a separate chunk (about.[hash].js) for this route
-        // which is lazy-loaded when the route is visited.
-        component: () => import(/* webpackChunkName: "about" */ '../views/PostView.vue')
+        component: () => import('../views/PostView.vue'),
+        beforeEnter: isAuthenticated,
     },
     {
         path: '/view-post/:memeId',
         name: 'PostDetails',
-        // route level code-splitting
-        // this generates a separate chunk (about.[hash].js) for this route
-        // which is lazy-loaded when the route is visited.
-        component: () => import(/* webpackChunkName: "about" */ '../views/PostDetails.vue')
+        component: () => import('../views/PostDetails.vue'),
+        beforeEnter: isAuthenticated,
     },
     {
         path: '/edit-post/:memeId',
         name: 'EditPost',
-        // route level code-splitting
-        // this generates a separate chunk (about.[hash].js) for this route
-        // which is lazy-loaded when the route is visited.
-        component: () => import(/* webpackChunkName: "about" */ '../views/EditPost.vue')
+        component: () => import('../views/EditPost.vue'),
+        beforeEnter: isAuthenticated,
     }
 ]
 
@@ -66,5 +69,6 @@ const router = createRouter({
     history: createWebHashHistory(),
     routes
 })
+
 
 export default router

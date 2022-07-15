@@ -26,6 +26,9 @@
                             type="password"
                         />
                     </div>
+                    <div v-if="error">
+                        <p>{{ error }}</p>
+                    </div>
                     <button class="btn" type="submit">
                         Connexion
                     </button>
@@ -42,64 +45,40 @@
 </template>
 
 <script>
-//Azerty@1
 export default {
     name: "LoginForm",
     data() {
         return {
             email: "",
             password: "",
+            error: "",
         };
     },
     methods: {
-        async login() {
-            const {email, password} = this;
-            const res = await fetch(
-                "http://127.0.0.1:3000/api/users/login",
-                {
-                    method: "POST",
-                    headers: {"Content-Type": "application/json; charset=UTF-8"},
-                    body: JSON.stringify({email, password})
-                }
-            );
-            const data = await res.json();
-            console.log(data)
-            localStorage.setItem('token', data.token)
-            localStorage.setItem('userId', data.userId)
-            console.log(localStorage.getItem('token'))
-            console.log(localStorage.getItem('userId'))
-            location.replace("/")
-        }/*
-        async login() {
-            await fetch('http://127.0.0.1:3000/api/users/login', {
-                // Adding method type
+        login() {
+            const url = "http://127.0.0.1:3000/api/users/login";
+            const options = {
                 method: "POST",
-                // Adding body or contents to send
                 body: JSON.stringify({
                     email: this.email,
                     password: this.password,
                 }),
-                // Adding headers to the request
-                headers: {"Content-type": "application/json; charset=UTF-8"}
-            })
-
-                // Converting to JSON
-                .then(response => {
-                    console.log(response)
-                    //localStorage.setItem('token', response.data.token)
+                headers: {"Content-Type": "application/json; charset=UTF-8"},
+            }
+            fetch(url, options)
+                .then(response => response.json())
+                .then(json => {
+                    localStorage.setItem('token', json.token)
+                    localStorage.setItem('userId', json.userId)
+                    localStorage.setItem('isAdmin', json.isAdmin)
                     location.replace("/")
-
                 })
-
-                // Displaying results to console
-                .then(json => console.log(json))
-                .then(() => this.$router.push("/post"))
                 .catch(error => {
-                    alert("Email ou Mot de Passe incorrect")
-                    console.error(error)
-                    this.revele = !this.revele
-                })
-        },*/
+                    error.message = error;
+                    alert(error)
+                });
+
+        }
     }
 };
 </script>

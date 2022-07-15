@@ -11,8 +11,6 @@ router.post("/signup", multer, userCtrl.signup);
 router.post("/login", userCtrl.login);
 // Retrieve all Users ✅
 router.get("/", auth, userCtrl.findAll);
-// Retrieve all Users with theirs memes
-router.get("/", auth, userCtrl.findAllWithMeme);
 // Retrieve all admin's User ✅
 router.get("/admin", auth, userCtrl.findAllAdmin);
 // Retrieve a single User with id ✅

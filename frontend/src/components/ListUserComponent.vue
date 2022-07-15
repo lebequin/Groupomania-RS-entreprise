@@ -1,18 +1,18 @@
 <template>
-    <div class="admin-container">
-        <h3>Admins</h3>
-        <div v-for="admin in admins" :key="admin.id">
+    <div class="user-container">
+        <h3>Utilisateurs</h3>
+        <div v-for="user in users" :key="user.id">
 
-            <div class="admin-info">
-                <img :src="admin.avatarUrl" alt="avatar utilisateur" class="user__avatar">
+            <div class="user-info">
+                <img :src="user.avatarUrl" alt="avatar utilisateur" class="user__avatar">
                 <div class="user__pseudo">
-                    <p>{{ admin.pseudo }} - {{ admin.email }}</p>
+                    <p>{{ user.pseudo }} - {{ user.email }}</p>
                 </div>
-                <div class="params__admin">
-                    <div class="params__button" @click="updateUser(admin.id)">
+                <div class="params__user">
+                    <div class="params__button" @click="updateUser(user.id)">
                         <i aria-hidden="true" class="fa fa-pencil"></i>
                     </div>
-                    <div class="params__button" @click="deleteUser(admin.id)">
+                    <div class="params__button" @click="deleteUser(user.id)">
                         <i aria-hidden="true" class="fa fa-trash"></i>
                     </div>
                 </div>
@@ -22,19 +22,17 @@
 </template>
 
 <script>
-import router from "@/router";
-import EditAccount from "@/views/EditAccount";
 
 export default {
-    name: 'ListAdminComponent',
+    name: "ListUserComponent",
     data() {
         return {
             token: localStorage.getItem("token"),
-            admins: [],
+            users: [],
         }
     },
     mounted() {
-        const url = `http://localhost:3000/api/users/admin`;
+        const url = `http://localhost:3000/api/users/`;
         const options = {
             method: "GET",
             headers: {
@@ -45,8 +43,8 @@ export default {
         fetch(url, options)
             .then(response => response.json())
             .then(data => {
-                this.admins = data;
-                console.log(this.admins)
+                this.users = data;
+                console.log(this.users)
             })
             .catch(error => console.log(error,));
     },
@@ -56,7 +54,6 @@ export default {
 
             if (window.confirm('Voulez-vous vraiment supprimer le compte ?')) {
                 const url = 'http://localhost:3000/api/users/' + userId;
-                console.log(url);
                 const options = {
                     method: "DELETE",
                     headers: {
@@ -75,17 +72,15 @@ export default {
             }
         },
 
-        updateUser: function () {
-            router.push(EditAccount)
+        updateUser: function (userId) {
+            this.$router.push('/edit-account/' + userId)
         }
     }
 }
 </script>
 
-<style lang="scss">
-@import url("../assets/css/general.scss");
-
-.admin-container {
+<style scoped>
+.user-container {
     max-width: 400px;
     margin: 2em auto;
     box-shadow: 0px 0px 31px -10px #aaa;
@@ -93,17 +88,17 @@ export default {
     padding: 40px;
 }
 
-.admin-info {
+.user-info {
     display: flex;
     justify-content: space-between;
 
 }
 
-.params__admin {
+.params__user {
     display: flex;
 }
 
-.params__admin i {
+.params__user i {
     font-size: 24px;
     margin: 13px;
     cursor: pointer;
@@ -117,8 +112,7 @@ export default {
     color: #00b06b;
 }
 
-.admin-info {
+.user-info {
     display: flex;
 }
-
 </style>

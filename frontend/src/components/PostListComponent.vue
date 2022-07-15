@@ -60,7 +60,6 @@ export default {
             .then(response => response.json())
             .then(data => {
                 this.memes = data;
-                console.log(data)
             })
             .catch(error => console.log(error));
     },

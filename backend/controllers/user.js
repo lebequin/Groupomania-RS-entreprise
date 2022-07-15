@@ -17,7 +17,6 @@ exports.signup = (req, res) => {
 
     if (req.file) {
         file = `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
-        console.log('avatar file: ' + file)
     }
     // Chiffrage du mot de passe avec bcrypt et un salage de 10
     bcrypt.hash(req.body.password, 10)
@@ -49,6 +48,7 @@ exports.login = (req, res, next) => {
                     return res.status(401).json({error: 'Mot de passe incorrect !'});
                 }
                 res.status(200).json({
+                    isAdmin: user.isAdmin,
                     userId: user.id,
                     token: jwt.sign(
                         {id: user.id},
@@ -84,13 +84,14 @@ exports.getOneUser = (req, res) => {
 
 // Mettre à jour un utilisateur par sa pk
 exports.update = (req, res) => {
-    if (req.auth.userId === parseInt(req.params.id)) {
+    if (req.auth.userId === parseInt(req.params.id) || req.admin.isAdmin) {
         console.log(req.params.id)
         const userObject = req.file ?
             {
                 ...req.body.user,
                 avatarUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
             } : {...req.body};
+        console.log(req.body)
         User.update({...userObject, id: req.params.id}, {where: {id: req.params.id}})
             .then(() => res.status(200).json({message: 'User updated successfully!'}))
             .catch(error => res.status(400).json({error}));
@@ -162,12 +163,4 @@ exports.findAll = (req, res) => {
                     err.message || "Some error occurred while retrieving users."
             });
         });
-};
-// récupère tous les utilisateurs avec leur meme associés
-exports.findAllWithMeme = () => {
-    return User.findAll({
-        include: ["memes"],
-    }).then((user) => {
-        return user;
-    });
 };

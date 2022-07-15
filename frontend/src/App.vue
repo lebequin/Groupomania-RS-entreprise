@@ -7,7 +7,7 @@
                 <router-link to="/">Accueil</router-link>
                 <router-link v-if="!token" to="/login">Connexion</router-link>
                 <router-link v-if="!token" to="/signup">Inscription</router-link>
-                <router-link v-show="token" to="/post">Publier</router-link>
+                <router-link v-show="token != 'undefined' && token" to="/post">Publier</router-link>
                 <router-link v-show="token" to="/account">Mon compte</router-link>
                 <router-link v-show="token" to="/login" @click="deconnexion">Déconnexion</router-link>
             </nav>
@@ -25,6 +25,9 @@ export default {
             token: localStorage.getItem('token')
         };
     },
+    mounted() {
+        console.log(typeof (this.token))
+    },
     computed: {
         getCurrentYear() {
             return new Date().getFullYear()
@@ -34,7 +37,7 @@ export default {
         deconnexion() {
             localStorage.removeItem('token');
             localStorage.removeItem('userId');
-            console.log(localStorage)
+            localStorage.removeItem('isAdmin');
             alert('Vous êtes déconnecté. Merci de votre visite.');
             location.replace("/")
         }

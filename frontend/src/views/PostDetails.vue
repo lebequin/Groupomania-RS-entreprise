@@ -8,11 +8,11 @@
                     <i v-if="user.isAdmin == 1" aria-hidden="true" class="fa fa-id-badge admin-badge"></i>
                 </div>
             </div>
-            <div v-if="user.userId == userId || user.isAdmin == true" class="params__meme">
-                <div class="params__button" @click="updateMeme(id)">
+            <div v-if="user.userId == userId || isAdmin == true" class="params__meme">
+                <div v-if="user.userId == userId" class="params__button" @click="updateMeme(id)">
                     <i aria-hidden="true" class="fa fa-pencil"></i>
                 </div>
-                <div class="params__button" @click="deleteMeme(id)">
+                <div v-if="isAdmin == true" class="params__button" @click="deleteMeme(id)">
                     <i aria-hidden="true" class="fa fa-trash"></i>
                 </div>
             </div>
@@ -58,6 +58,7 @@ export default {
         return {
             userId: localStorage.getItem('userId'),
             id: window.location.href.split("/").slice(-1)[0],
+            isAdmin: 0,
             title: "",
             fileUrl: "",
             createdAt: "",
@@ -79,7 +80,6 @@ export default {
         fetch(url, options)
             .then(response => response.json())
             .then(data => {
-                console.log(data);
                 this.title = data.title;
                 this.fileUrl = data.fileUrl;
                 this.createdAt = data.createdAt;
@@ -87,28 +87,27 @@ export default {
                 this.user = data.user;
                 this.likes = data.likes;
                 this.comments = data.comments;
-                console.log(this.user.avatarUrl);
-
             })
             .catch(error => console.log(error));
     },
     methods: {
         deleteMeme(memeId) {
-            const url = "http://localhost:3000/api/post/" + memeId;
-            const options = {
-                method: "DELETE",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": "Bearer " + localStorage.getItem("token"),
-                },
-            };
-            fetch(url, options)
-                .then(response => response.json())
-                .then(data => {
-                    this.memes = data;
-                    window.location.reload();
-                })
-                .catch(error => console.log(error));
+            if (window.confirm('Voulez-vous vraiment supprimer le meme ?')) {
+                const url = "http://localhost:3000/api/post/" + memeId;
+                const options = {
+                    method: "DELETE",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": "Bearer " + localStorage.getItem("token"),
+                    }
+                };
+                fetch(url, options)
+                    .then(() => {
+                        alert("Le meme a bien été supprimé.")
+                        window.location.replace("/")
+                    })
+                    .catch(error => console.log(error,));
+            }
         },
         updateMeme(memeId) {
             this.$router.push({
@@ -150,6 +149,8 @@ export default {
             .then(data => {
                 this.pseudo = data.pseudo;
                 this.avatarUrl = data.avatarUrl;
+                this.isAdmin = data.isAdmin;
+                console.log('currentUser', this.isAdmin)
             })
             .catch(error => console.log(error,));
     },
