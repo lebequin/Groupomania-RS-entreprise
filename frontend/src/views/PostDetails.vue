@@ -29,7 +29,7 @@
                         <i v-if="likes.isLike == false" aria-hidden="true" class="fa fa-heart"></i>
                         <i v-else aria-hidden="true" class="fa fa-heart" style="color:red"></i>
                     </a>
-                    <p>{{ likes.length }}</p>
+                    <p> {{ countLikes() }}</p>
                 </div>
                 <div class="comment-container">
                     <i class="fa fa-comment"></i>
@@ -63,6 +63,7 @@ export default {
             fileUrl: "",
             createdAt: "",
             updatedAt: "",
+            number: "",
             user: [],
             likes: [],
             comments: []
@@ -132,8 +133,30 @@ export default {
                 .then(response => response.json())
                 .then(json => {
                     console.log('donnée envoyées : ', json)
+                    console.log(this.likes.length)
+                    this.countLikes()
+
                 })
                 .catch(error => console.log(error));
+        },
+        countLikes() {
+            const url = "http://127.0.0.1:3000/api/post/like/" + this.id;
+            const options = {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": "Bearer " + localStorage.getItem("token"),
+                }
+            };
+            fetch(url, options)
+                .then(response => response.json())
+                .then(data => {
+                    this.number = data.number;
+                })
+                .catch(error => console.log(error));
+
+            console.log(this.number);
+            return this.number
         }
     },
     created: function () {

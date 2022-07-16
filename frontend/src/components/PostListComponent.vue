@@ -18,10 +18,8 @@
                 :{{ new Date(meme.createdAt).toLocaleString("fr-FR") }}</p>
             <p v-else>Mis à jour :{{ new Date(meme.createdAt).toLocaleString("fr-FR") }}</p>
             <div class="like-container">
-                <a @click="likeMeme(meme.id)">
-                    <i v-if="isLike = false" aria-hidden="true" class="fa fa-heart"></i>
-                    <i v-else aria-hidden="true" class="fa fa-heart" style="color:red"></i>
-                </a>
+                <i v-if="meme.likes.length == 0" aria-hidden="true" class="fa fa-heart"></i>
+                <i v-else aria-hidden="true" class="fa fa-heart" style="color:red"></i>
                 <p>{{ meme.likes.length }}</p>
             </div>
             <div class="comment-container">

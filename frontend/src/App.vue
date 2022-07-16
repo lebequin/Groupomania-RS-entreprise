@@ -25,9 +25,6 @@ export default {
             token: localStorage.getItem('token')
         };
     },
-    mounted() {
-        console.log(typeof (this.token))
-    },
     computed: {
         getCurrentYear() {
             return new Date().getFullYear()
