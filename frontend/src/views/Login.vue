@@ -43,7 +43,6 @@
 </template>
 
 <script>
-import SignupView from "@/views/SignupView";
 
 export default {
     name: "LoginForm",
@@ -53,9 +52,6 @@ export default {
             password: "",
             error: "",
         };
-    },
-    components: {
-        SignupView
     },
     methods: {
         login() {
