@@ -1,15 +1,16 @@
 <template>
     <div class="comments-container">
         <div v-for="comment in comments" :key="comment.id" class="comment__display">
-            <div class="reply__list">
-                <div>
-                    <EditCommentComponent v-if="isHidden == true" :commentId="comment.id"></EditCommentComponent>
+            <div class="reply__comment">
+                <p class="reply-pseudo">@{{ comment.pseudo }}</p>
+                <EditCommentComponent v-if="commentEditId == comment.id"
+                                      :commentId="comment.id"></EditCommentComponent>
+                <div v-else class="message">
                     <p>{{ comment.message }}</p>
-                    <i v-if="isAdmin == true" class="fa fa-trash" @click="deleteComment(comment.id)"></i>
-                </div>
-                <div v-if="comment.userId == this.userId" class="comment-options">
-                    <i class="fa fa-trash" @click="deleteComment(comment.id)"></i>
-                    <i class="fa fa-pencil" @click="isHidden = !isHidden"></i>
+                    <div v-if="comment.userId == this.userId || isAdmin == 1" class="comment-options">
+                        <i class="fa fa-pencil" @click="commentEditId = comment.id"></i>
+                        <i class="fa fa-trash" @click="deleteComment(comment.id)"></i>
+                    </div>
                 </div>
             </div>
         </div>
@@ -28,11 +29,10 @@ export default {
         return {
             userId: localStorage.getItem('userId'),
             isAdmin: 0,
-            message: '',
-            isHidden: false,
+            message: null,
+            commentEditId: null,
         }
     },
-
     props: {
         memeId: Number,
         comments: Array,
@@ -92,4 +92,24 @@ export default {
     float: right;
 }
 
+.reply__comment {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    padding: 0 15px;
+}
+
+.comment-options {
+    width: 12%;
+    display: flex;
+    justify-content: space-around;
+}
+
+.message {
+    display: flex;
+    width: 80%;
+    justify-content: space-between;
+    align-items: baseline;
+
+}
 </style>

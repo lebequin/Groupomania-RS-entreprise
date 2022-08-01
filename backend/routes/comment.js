@@ -6,6 +6,8 @@ const commentCtrl = require('../controllers/comment');
 
 // Create a comment ✅
 router.post('/:memeId', auth, commentCtrl.createComment);
+// Retrieve a comment ✅
+router.get('/:commentId', auth, commentCtrl.getOneComment);
 // Update a comment by pk ✅
 router.put('/:commentId', auth, commentCtrl.updateComment);
 // Delete a meme by pk ✅

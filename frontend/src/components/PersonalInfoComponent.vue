@@ -5,11 +5,9 @@
             <img :alt="$data.pseudo" :src="$data.avatarUrl"/>
         </div>
         <div class="container-account">
-            <h4 id="pseudo">{{ $data.pseudo }}</h4>
-            <h4>Identifiant :</h4>
-            <p class="allp">{{ $data.id }}</p>
-            <h4>email :</h4>
-            <p class="allp">{{ $data.email }}</p>
+            <h4 id="pseudo">{{ pseudo }}</h4>
+            <h4>Identifiant : {{ id }}</h4>
+            <h4>email : {{ email }}</h4>
             <div class="action">
                 <button class="btn" @click="updateUser">Modifier mes informations</button>
                 <button class="btn--secondary" @click="deleteUser">Supprimer mon compte</button>
@@ -26,6 +24,8 @@ export default {
     name: 'PersonalInfoComponent',
     data() {
         return {
+            token: localStorage.getItem("token"),
+            userId: localStorage.getItem("userId"),
             id: '',
             email: '',
             pseudo: '',
@@ -34,15 +34,13 @@ export default {
     },
     mounted() {
         //Appel à API pour affichage des infos utilisateur
-        let token = localStorage.getItem("token");
-        let userId = localStorage.getItem("userId");
 
-        const url = `http://localhost:3000/api/users/${userId}`;
+        const url = `http://localhost:3000/api/users/` + this.userId;
         const options = {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
-                "Authorization": "Bearer " + token,
+                "Authorization": "Bearer " + this.token,
             }
         };
         fetch(url, options)
@@ -57,16 +55,14 @@ export default {
     },
     methods: {
         deleteUser: function () { //Fonction permettant à utilisateur de supprimer son compte
-            let token = localStorage.getItem("token");
-            let userId = localStorage.getItem("userId");
 
             if (window.confirm('Voulez-vous vraiment supprimer le compte ?')) {
-                const url = 'http://localhost:3000/api/users/' + userId;
+                const url = 'http://localhost:3000/api/users/' + this.userId;
                 const options = {
                     method: "DELETE",
                     headers: {
                         "Content-Type": "application/json",
-                        "Authorization": "Bearer " + token,
+                        "Authorization": "Bearer " + this.token,
                     }
                 };
                 fetch(url, options)

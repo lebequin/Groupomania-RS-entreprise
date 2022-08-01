@@ -27,47 +27,43 @@ db.comment = require("./Comment.js")(sequelize, Sequelize);
 
 // Ajout des dépendances entre les tables, des contraintes et des onDelete sur les models
 
-db.user.hasMany(db.meme, {as: "memes"});
+db.user.hasMany(db.meme, {as: "memes", onDelete: 'CASCADE', hooks: true});
 db.meme.belongsTo(db.user, {
     foreignKey: {
         allowNull: false,
         name: "userId",
     },
-    onDelete: 'CASCADE',
+
 });
-db.user.hasMany(db.like, {as: "likes"});
+db.user.hasMany(db.like, {as: "likes", onDelete: 'CASCADE', hooks: true});
 db.like.belongsTo(db.user, {
     foreignKey: {
         allowNull: false,
         name: "userId",
     },
-    onDelete: 'CASCADE',
     as: "user",
 });
-db.meme.hasMany(db.like, {as: "likes"});
+db.meme.hasMany(db.like, {as: "likes", onDelete: 'CASCADE', hooks: true});
 db.like.belongsTo(db.meme, {
     foreignKey: {
         allowNull: false,
         name: "memeId",
     },
-    onDelete: 'CASCADE',
 });
-db.meme.hasMany(db.comment, {as: "comments"});
+db.meme.hasMany(db.comment, {as: "comments", onDelete: 'CASCADE', hooks: true});
 db.comment.belongsTo(db.meme, {
     foreignKey: {
         allowNull: false,
         name: "memeId",
     },
-    onDelete: 'CASCADE',
     as: "meme",
 });
-db.user.hasMany(db.comment, {as: "comments"});
+db.user.hasMany(db.comment, {as: "comments", onDelete: 'CASCADE', hooks: true});
 db.comment.belongsTo(db.user, {
     foreignKey: {
         allowNull: false,
         name: "userId",
     },
-    onDelete: 'CASCADE',
     as: "user",
 });
 

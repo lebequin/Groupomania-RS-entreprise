@@ -2,7 +2,7 @@
     <div class="meme__container">
         <div class="header__meme">
             <div class="header_user">
-                <img :src="user.avatarUrl" alt="avatar utilisateur" class="user__avatar">
+                <img :alt="'avatar utilisateur ' + user.pseudo" :src="user.avatarUrl" class="user__avatar">
                 <div class="user__pseudo">
                     <p>{{ user.pseudo }}</p>
                     <i v-if="user.isAdmin == 1" aria-hidden="true" class="fa fa-id-badge admin-badge"></i>
@@ -38,7 +38,7 @@
             </div>
         </div>
         <ListCommentComponent :comments="comments"/>
-        <div v-if="!isHidden" class="answer-container">
+        <div class="answer-container">
             <ReplyMemeComponent :memeId="id"/>
         </div>
     </div>
@@ -299,4 +299,7 @@ export default {
     margin: 0 10px;
 }
 
+.answer-container {
+    clear: both;
+}
 </style>

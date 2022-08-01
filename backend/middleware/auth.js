@@ -8,6 +8,9 @@ module.exports = (req, res, next) => {
         const token = req.headers.authorization.split(' ')[1];
         const decodedToken = jwt.verify(token, `${TOKEN}`);
 
+        if (decodedToken.iat > decodedToken.exp) {
+            return res.status(401).json({message: `Vous devez vous reconnecter pour accéder à votre espace`});
+        }
         const userId = decodedToken.id;
         const user = User.findOne({
             where: {
@@ -15,21 +18,20 @@ module.exports = (req, res, next) => {
             },
         }).then(user => {
             if (!user) {
-                return res.status(401).json({ message: `Id : ${userId} does not exist.` });
+                return res.status(401).json({message: `Id : ${userId} does not exist.`});
             } else if (parseInt(req.body.userId) && parseInt(req.body.userId) !== parseInt(userId)) {
-                return res.status(401).json({ message: "Your not authorized" });
+                return res.status(401).json({message: "Vous n'êtes pas autorisé à accéder à cette page"});
             } else {
-                req.auth = { userId };
-                req.admin = { isAdmin: user.isAdmin };
+                req.auth = {userId};
+                req.admin = {isAdmin: user.isAdmin};
                 next();
             }
         });
 
-
         // suppression req.Admin
     } catch {
         res.status(401).json({
-            error: new Error('Invalid request!')
+            error: new Error('Requête invalide!')
         });
     }
 };

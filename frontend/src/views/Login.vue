@@ -33,10 +33,8 @@
                         Connexion
                     </button>
                     <hr/>
-                    <router-link to="/register">
-                        <button class="btn btn-primary pr-5 pl-5 m-3">
-                            Créer votre compte
-                        </button>
+                    <router-link to="/signup">
+                        <button class="btn btn-primary pr-5 pl-5 m-3">Créer votre compte</button>
                     </router-link>
                 </form>
             </div>
@@ -45,6 +43,8 @@
 </template>
 
 <script>
+import SignupView from "@/views/SignupView";
+
 export default {
     name: "LoginForm",
     data() {
@@ -53,6 +53,9 @@ export default {
             password: "",
             error: "",
         };
+    },
+    components: {
+        SignupView
     },
     methods: {
         login() {
@@ -71,13 +74,16 @@ export default {
                     localStorage.setItem('token', json.token)
                     localStorage.setItem('userId', json.userId)
                     localStorage.setItem('isAdmin', json.isAdmin)
-                    location.replace("/")
+                    this.error = json.error;
+                    if (!json.error) {
+                        location.replace("/")
+                    }
+
                 })
                 .catch(error => {
                     error.message = error;
                     alert(error)
                 });
-
         }
     }
 };

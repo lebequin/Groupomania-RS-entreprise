@@ -1,29 +1,28 @@
 <template>
-    <div v-for="meme in memes.data" :key="meme.id" class="meme__container">
+    <div v-for="meme in memes.data" :key="meme.id" class="meme__container" @click="postDetails(meme.id)">
         <div class="header__meme">
             <div class="header_user">
-                <img :src="meme.user.avatarUrl" alt="avatar utilisateur" class="user__avatar">
+                <img :alt="meme.user.pseudo" :src="meme.user.avatarUrl" class="user__avatar">
                 <div class="user__pseudo">
-                    <p @click="postDetails(meme.id)">{{ meme.user.pseudo }}</p>
+                    <p>{{ meme.user.pseudo }}</p>
                     <i v-if="meme.user.isAdmin == 1" aria-hidden="true" class="fa fa-id-badge admin-badge"></i>
                 </div>
             </div>
         </div>
+        <hr>
         <div class="body__meme">
             <h2 class="meme__title">{{ meme.title }}</h2>
-            <img :src="meme.fileUrl" alt="image" class="meme__img">
+            <img :alt="meme.title" :src="meme.fileUrl" class="meme__img">
         </div>
         <div class="footer__meme">
             <p v-if="meme.updatedAt > meme.createdAt">Publié
                 :{{ new Date(meme.createdAt).toLocaleString("fr-FR") }}</p>
             <p v-else>Mis à jour :{{ new Date(meme.createdAt).toLocaleString("fr-FR") }}</p>
-            <div class="like-container">
+            <div class="interaction-container">
                 <i v-if="meme.likes.length == 0" aria-hidden="true" class="fa fa-heart"></i>
                 <i v-else aria-hidden="true" class="fa fa-heart" style="color:red"></i>
                 <p>{{ meme.likes.length }}</p>
-            </div>
-            <div class="comment-container">
-                <a v-on:click="isHidden = !isHidden"><i class="fa fa-comment"></i></a>
+                <i class="fa fa-comment"></i>
                 <p>{{ meme.comments.length }}</p>
             </div>
         </div>
@@ -57,6 +56,7 @@ export default {
         fetch(url, options)
             .then(response => response.json())
             .then(data => {
+                console.log(data)
                 this.memes = data;
             })
             .catch(error => console.log(error));
@@ -168,12 +168,11 @@ export default {
     justify-content: space-between;
 }
 
-.like-container {
+.interaction-container {
     display: flex;
-}
-
-.comment-container {
-    display: flex;
+    align-items: baseline;
+    width: 20%;
+    justify-content: space-evenly;
 }
 
 .user__pseudo {

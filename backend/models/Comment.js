@@ -5,5 +5,9 @@ module.exports = (sequelize, Sequelize) => {
             type: Sequelize.STRING,
             default: false
         },
+        pseudo: {
+            type: Sequelize.STRING,
+            default: 'Unknown'
+        }
     });
 };

@@ -4,12 +4,11 @@
             <img alt="Logo du réseau social d'entreprise Groupomania" height="100"
                  src="../src/assets/logo/icon-left-font.svg">
             <nav id="menu">
-                <router-link to="/">Accueil</router-link>
-                <router-link v-if="!token" to="/login">Connexion</router-link>
-                <router-link v-if="!token" to="/signup">Inscription</router-link>
+                <router-link v-show="token != 'undefined' && token" to="/">Accueil</router-link>
                 <router-link v-show="token != 'undefined' && token" to="/post">Publier</router-link>
-                <router-link v-show="token" to="/account">Mon compte</router-link>
-                <router-link v-show="token" to="/login" @click="deconnexion">Déconnexion</router-link>
+                <router-link v-show="token != 'undefined' && token" to="/account">Mon compte</router-link>
+                <router-link v-show="token != 'undefined' && token" to="/login" @click="deconnexion">Déconnexion
+                </router-link>
             </nav>
 
         </div>
@@ -38,6 +37,9 @@ export default {
             alert('Vous êtes déconnecté. Merci de votre visite.');
             location.replace("/")
         }
+    },
+    created() {
+        document.documentElement.setAttribute('lang', 'fr')
     }
 }
 </script>
@@ -75,7 +77,7 @@ nav {
         margin: 0 20px;
 
         &.router-link-exact-active {
-            color: #00B06B;
+            color: #00975b;
         }
     }
 }

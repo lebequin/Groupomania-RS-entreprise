@@ -103,36 +103,20 @@ exports.update = (req, res) => {
 
 // Supprimer l'utilisateur par sa pk
 exports.delete = (req, res) => {
-    const imageUrl = req.body.avatarUrl;
-
-    //Suppression de l'utilisateur uniquement par un admin
-    if (req.admin.isAdmin === false)
-        res.status(401).send('You do not have permission to delete this user')
-    else {
-        User.destroy({
-            where: {id: req.auth.userId}
-        })
-            .then(num => {
-                console.log(num)
-                if (num == 1) {
-                    // Suppression de l'image de l'utilisateur
-                    const filename = imageUrl.split('/images/')[1];
-                    fs.unlinkSync(`images/${filename}`);
-                    res.status(200).send({
-                        message: "User was deleted successfully!"
-                    });
-                } else {
-                    res.status(400).send({
-                        message: `Cannot delete User with id=${id}. Maybe User was not found!`
-                    });
-                }
-            })
-            .catch(err => {
-                res.status(500).send({
-                    message: "Could not delete User :" + err
+    User.findOne({where: {id: req.params.id}})
+        .then((user) => {
+            if (user.id === req.auth.userId || req.token.isAdmin) {
+                const filename = user.avatarUrl.split('/images/')[1];
+                fs.unlink(`images/${filename}`, () => {
+                    User.destroy({where: {id: req.params.id}})
+                        .then(() => res.status(201).json({message: 'Utilisateur supprimé !'}))
+                        .catch(error => res.status(400).json({error, message: error.message}));
                 });
-            });
-    }
+            } else {
+                res.status(403).json({message: 'You do not have permission to delete this user'});
+            }
+        })
+        .catch(error => res.status(500).json({error, message: error.message}));
 };
 
 // Récupère tous les admins de la base

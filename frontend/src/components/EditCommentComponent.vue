@@ -40,8 +40,9 @@ export default {
             .catch(error => console.log(error))
     },
     methods: {
-        updateComment(id) {
-            const url = "http://localhost:3000/api/post/comment/" + id
+        updateComment() {
+            console.log(this.commentId)
+            const url = "http://localhost:3000/api/post/comment/" + this.commentId
             const options = {
                 method: "PUT",
                 headers: {
@@ -51,10 +52,13 @@ export default {
                 body: JSON.stringify(this.commentInput)
             }
             fetch(url, options)
-                .then(response => response.json())
+                .then(response => {
+                    console.log(response)
+                    response.json()
+                })
+
                 .then(data => {
-                    this.comments.push(data);
-                    this.comment.message = "";
+                    console.log(data)
                     window.location.reload();
                 })
                 .catch(error => console.log(error))
@@ -71,7 +75,7 @@ export default {
 .update-comment-container {
     display: flex;
     justify-content: space-between;
-    max-width: 100%;
+    width: 100%;
     padding: 10px;
     margin: auto;
 }
