@@ -26,7 +26,7 @@
                         />
                     </div>
                     <img :src="avatarUrl" alt="" class="avatar-preview">
-                    <button class="btn btn--upload" @click="onPickFile">Choisir mon avatar</button>
+                    <button class="btn btn--upload" @click.prevent="onPickFile">Choisir mon avatar</button>
                     <input
                         id="avatarUrl"
                         ref="fileInput"
@@ -44,6 +44,7 @@
                             type="password"
                         />
                     </div>
+                    <ErrorMessageComponent v-if="error" :error="error"/>
                     <button class="btn btn-primary m-3" type="submit" @click.prevent="register">
                         Créez votre compte
                     </button>
@@ -55,14 +56,18 @@
 
 <script>
 
+import ErrorMessageComponent from "@/components/ErrorMessageComponent";
+
 export default {
     name: "RegisterForm",
+    components: {ErrorMessageComponent},
     data() {
         return {
-            pseudo: "",
-            email: "",
-            avatarUrl: "",
-            password: "",
+            pseudo: null,
+            email: null,
+            avatarUrl: null,
+            password: null,
+            error: null,
         };
     },
     methods: {
@@ -84,10 +89,12 @@ export default {
 
                 // Displaying results to console
                 .then(json => {
-                    console.log('donnée envoyées : ', json)
-                    this.$router.push("/login")
+                    this.error = json.error;
+                    if (!json.error) {
+                        this.$router.push("/login")
+                    }
                 })
-                .catch((err) => console.log(err));
+                .catch((err) => this.error = err);
         },
         onPickFile() {
             this.$refs.fileInput.click()

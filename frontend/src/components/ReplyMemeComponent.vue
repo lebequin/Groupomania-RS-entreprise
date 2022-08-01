@@ -3,9 +3,12 @@
         <input id="answerContent" v-model="message" class="input-field" placeholder="Commenter" type="text"/>
         <button class="btn btn-primary" type="submit">Commenter</button>
     </form>
+    <ErrorMessageComponent v-if="error" :error="error"/>
 </template>
 
 <script>
+
+import ErrorMessageComponent from "@/components/ErrorMessageComponent";
 
 export default {
     name: "ReplyMemeComponent",
@@ -14,9 +17,11 @@ export default {
             userId: localStorage.getItem('userId'),
             pseudo: '',
             message: '',
+            error: null,
         }
     },
     props: ['memeId'],
+    components: {ErrorMessageComponent},
     mounted() {
         //Appel à API pour affichage des infos utilisateur
         let token = localStorage.getItem("token");
@@ -52,13 +57,17 @@ export default {
                     "Authorization": "Bearer " + localStorage.getItem("token"),
                 },
             };
-            fetch(url, options)
-                .then(response => response.json())
-                .then(json => {
-                    console.log('donnée envoyées : ', json)
-                    window.location.reload()
-                })
-                .catch(error => console.log(error));
+            if (this.message == null || this.message == '') {
+                this.error = 'Le commentaire ne peut pas être vide'
+
+            } else {
+                fetch(url, options)
+                    .then(response => {
+                        response.json()
+                        window.location.reload()
+                    })
+                    .catch(error => console.log(error));
+            }
         }
     }
 

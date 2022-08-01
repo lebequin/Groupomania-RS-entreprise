@@ -9,10 +9,11 @@
                 </div>
                 <div class="form-group upload-image">
                     <img :src="fileUrl" alt="" class="meme-preview">
-                    <button class="btn btn--upload" @click="onPickFile">Choisir mon meme</button>
+                    <button class="btn btn--upload" @click.prevent="onPickFile">Choisir mon meme</button>
                     <input id="fileUrl" ref="fileInput" accept="image/*" style="display: none" type="file"
                            @change="onFilePicked"/>
                 </div>
+                <ErrorMessageComponent v-if="error" :error="error"/>
                 <button class="btn btn-primary m-3" type="submit" @click.prevent="post">Publier</button>
             </form>
         </div>
@@ -20,13 +21,16 @@
 </template>
 
 <script>
+import ErrorMessageComponent from "@/components/ErrorMessageComponent";
 
 export default {
     name: 'PostView',
+    components: {ErrorMessageComponent},
     data() {
         return {
-            title: "",
-            fileUrl: "",
+            title: null,
+            fileUrl: null,
+            error: null,
         };
     },
     methods: {
@@ -35,26 +39,33 @@ export default {
             let formData = new FormData();
             formData.append('title', this.title);
             formData.append('image', input.files[0]);
-
-            fetch('http://127.0.0.1:3000/api/post', {
-                // Adding method type
-                method: "POST",
-                // Adding body or contents to send
-                body: formData,
-                // Adding headers to the request
-                headers: {'Authorization': 'Bearer ' + localStorage.getItem('token')}
-            })
-
-                // Converting to JSON
-                .then(response => response.json())
-
-                // Displaying results to console
-                .then(json => {
-                    console.log('donnée envoyées : ', json)
-                    this.$router.push("/")
+            if (this.title == null || this.fileUrl == null) {
+                this.error = 'Un champ obligatoire est vide'
+            } else {
+                
+                fetch('http://127.0.0.1:3000/api/post', {
+                    // Adding method type
+                    method: "POST",
+                    // Adding body or contents to send
+                    body: formData,
+                    // Adding headers to the request
+                    headers: {'Authorization': 'Bearer ' + localStorage.getItem('token')}
                 })
-                .catch((err) => console.log(err));
+
+                    // Converting to JSON
+                    .then(response => response.json())
+
+                    // Displaying results to console
+                    .then(json => {
+                        this.error = json.error;
+                        if (!json.error) {
+                            this.$router.push("/")
+                        }
+                    })
+                    .catch((err) => console.log(err));
+            }
         },
+
         onPickFile() {
             this.$refs.fileInput.click()
         },
@@ -68,7 +79,7 @@ export default {
             fileReader.readAsDataURL(files[0])
             this.image = files[0]
         },
-        
+
     }
 };
 </script>

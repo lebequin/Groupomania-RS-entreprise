@@ -12,8 +12,9 @@ const TOKEN = process.env.TOKEN;
 // Création et enregistrement d'un utilisateur
 exports.signup = (req, res) => {
     let file = null;
-    utils.verifySignup(req, res)
-    logger.info('Enter signup function');
+    if (!utils.verifySignup(req, res)) {
+        return
+    }
 
     if (req.file) {
         file = `${req.protocol}://${req.get('host')}/images/${req.file.filename}`

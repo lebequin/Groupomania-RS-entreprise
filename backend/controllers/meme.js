@@ -29,7 +29,6 @@ exports.createMeme = (req, res, next) => {
 
 exports.getOneMeme = (req, res) => {
     const id = req.params.id;
-    console.log(id)
     Meme.findByPk(id, {include: ['likes', 'comments', 'user']})
         .then(data => {
             if (data) {
@@ -134,7 +133,6 @@ exports.getAllMeme = (req, res, next) => {
         include: ['likes', 'comments', 'user']
     })
         .then(meme => {
-            console.log(meme);
             res.status(200).json({data: meme});
         })
         .catch(error => res.status(400).json({error}));

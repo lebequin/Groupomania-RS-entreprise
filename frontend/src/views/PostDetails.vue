@@ -8,8 +8,8 @@
                     <i v-if="user.isAdmin == 1" aria-hidden="true" class="fa fa-id-badge admin-badge"></i>
                 </div>
             </div>
-            <div v-if="user.userId == userId || isAdmin == true" class="params__meme">
-                <div v-if="user.userId == userId" class="params__button" @click="updateMeme(id)">
+            <div v-if="user.id == userId || isAdmin == true" class="params__meme">
+                <div v-if="user.id == userId" class="params__button" @click="updateMeme(id)">
                     <i aria-hidden="true" class="fa fa-pencil"></i>
                 </div>
                 <div v-if="isAdmin == true" class="params__button" @click="deleteMeme(id)">
@@ -130,12 +130,9 @@ export default {
                 },
             };
             fetch(url, options)
-                .then(response => response.json())
-                .then(json => {
-                    console.log('donnée envoyées : ', json)
-                    console.log(this.likes.length)
+                .then(response => {
+                    response.json()
                     this.countLikes()
-
                 })
                 .catch(error => console.log(error));
         },
@@ -155,7 +152,6 @@ export default {
                 })
                 .catch(error => console.log(error));
 
-            console.log(this.number);
             return this.number
         }
     },
@@ -173,7 +169,6 @@ export default {
                 this.pseudo = data.pseudo;
                 this.avatarUrl = data.avatarUrl;
                 this.isAdmin = data.isAdmin;
-                console.log('currentUser', this.isAdmin)
             })
             .catch(error => console.log(error,));
     },

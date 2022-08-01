@@ -26,9 +26,7 @@
                             type="password"
                         />
                     </div>
-                    <div v-if="error">
-                        <p>{{ error }}</p>
-                    </div>
+                    <ErrorMessageComponent v-if="error" :error="error"/>
                     <button class="btn" type="submit">
                         Connexion
                     </button>
@@ -43,6 +41,7 @@
 </template>
 
 <script>
+import ErrorMessageComponent from "@/components/ErrorMessageComponent";
 
 export default {
     name: "LoginForm",
@@ -53,6 +52,8 @@ export default {
             error: "",
         };
     },
+    components: {ErrorMessageComponent},
+
     methods: {
         login() {
             const url = "http://127.0.0.1:3000/api/users/login";
