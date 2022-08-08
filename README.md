@@ -11,7 +11,7 @@
 
 ### 🔨 Construisez des API sécurisées avec JavaScript et le design du site
 
-Le site hébergé sur GitHub : [Groupomania](https://github.com/lebequin/Groupomania_Reseau_social_entreprise)
+Le site hébergé sur GitHub : [Groupomania](https://github.com/lebequin/BEQUIN_LEO_7_21032022)
 
 ##### Compétences évaluées
 
